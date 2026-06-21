@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -300,6 +301,50 @@
     border-color: #1565c0;
     box-shadow: 0 0 8px #a6c8ff;
   }
+  /* استایل مودال */
+  .modalOverlay {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+  }
+  .modalOverlay.active {
+    display: flex;
+  }
+  .modalContent {
+    background: white;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    padding: 20px 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+  .modalContent h3 {
+    margin-top: 0;
+    color: #1565c0;
+  }
+  .closeModalBtn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s;
+  }
+  .closeModalBtn:hover {
+    color: #3498db;
+  }
   @media (max-width: 640px) {
     #topButtonsContainer {
       flex-direction: column;
@@ -333,6 +378,18 @@
 
 <h1>Text2Html</h1>
 
+<div style="max-width: 900px; width: 100%; margin-bottom: 25px; text-align: center;">
+  <label for="fontSelect" style="font-weight: 700; color: #1565c0; margin-left: 10px;">انتخاب فونت:</label>
+  <select id="fontSelect" aria-label="انتخاب فونت" style="padding: 6px 12px; font-size: 16px; border-radius: 8px; border: 2px solid #3498db; outline: none; min-width: 180px;">
+    <option value="Tahoma, sans-serif" selected>Tahoma</option>
+    <option value="'Arial', sans-serif">Arial</option>
+    <option value="'Courier New', monospace">Courier New</option>
+    <option value="'Times New Roman', serif">Times New Roman</option>
+    <option value="'Segoe UI', sans-serif">Segoe UI</option>
+    <option value="'Verdana', sans-serif">Verdana</option>
+  </select>
+</div>
+
 <div id="topButtonsContainer" aria-label="دکمه‌های عملیات">
   <button id="toggleAllCategoriesBtn" title="باز/بسته کردن همه دسته‌ها (کلید میانبر: A)">باز/بسته کردن همه دسته‌ها</button>
   <button id="exportHTMLBtn" title="خروجی HTML">خروجی HTML</button>
@@ -345,6 +402,10 @@
   </label>
   <input type="file" id="importJSON" accept=".json" style="display:none" aria-label="وارد کردن فایل JSON" />
   <button id="exportJSONBtn" title="خروجی JSON">خروجی JSON</button>
+
+  <!-- دکمه‌های جدید -->
+  <button id="helpBtn" title="نمایش فایل راهنما">راهنما</button>
+  <button id="authorInfoBtn" title="مشخصات نویسنده">مشخصات نویسنده</button>
 </div>
 
 <div id="infoSummary" aria-live="polite" aria-atomic="true">
@@ -361,7 +422,6 @@
   <input type="file" id="fileInput" accept=".txt,.bat,.css,.js" multiple aria-label="انتخاب فایل‌ها" />
 </section>
 
-<!-- بخش جدید برای وارد کردن دستی متن -->
 <section id="manualAddSection" aria-label="افزودن فایل به صورت دستی" style="max-width: 900px; width: 100%; margin-bottom: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
   <h2>افزودن فایل به صورت دستی</h2>
   <label for="manualFileName">نام فایل:</label>
@@ -385,6 +445,38 @@
   <input type="search" id="searchInput" placeholder="عبارت مورد نظر را وارد کنید" aria-label="عبارت جستجو" autocomplete="off" />
   <div id="searchResults" aria-live="polite" role="region" aria-atomic="true">عبارتی وارد نشده است.</div>
 </section>
+
+<!-- مودال راهنما -->
+<div id="helpModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle" aria-describedby="helpModalDesc">
+  <div class="modalContent">
+    <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
+    <h3 id="helpModalTitle">راهنمای استفاده از Text2Html</h3>
+    <div id="helpModalDesc">
+      <p>در این برنامه می‌توانید فایل‌های متنی با فرمت‌های txt, bat, css و js را اضافه کنید، آن‌ها را دسته‌بندی نمایید و محتوای آن‌ها را مشاهده و ویرایش کنید.</p>
+      <ul>
+        <li>برای افزودن فایل‌ها از طریق درگ و دراپ یا دکمه انتخاب فایل استفاده کنید.</li>
+        <li>می‌توانید فایل جدید به صورت دستی با وارد کردن نام، دسته‌بندی و محتوا اضافه کنید.</li>
+        <li>از دکمه‌های بالای صفحه برای خروجی گرفتن، ذخیره فایل‌ها و جستجو استفاده نمایید.</li>
+        <li>نام دسته‌بندی و فایل‌ها قابل ویرایش هستند.</li>
+        <li>برای باز و بسته کردن دسته‌بندی‌ها از دکمه «باز/بسته کردن همه دسته‌ها» استفاده کنید.</li>
+      </ul>
+      <p>امیدواریم این ابزار برای شما مفید باشد!</p>
+    </div>
+  </div>
+</div>
+
+<!-- مودال مشخصات نویسنده -->
+<div id="authorModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="authorModalTitle" aria-describedby="authorModalDesc">
+  <div class="modalContent">
+    <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
+    <h3 id="authorModalTitle">مشخصات نویسنده</h3>
+    <div id="authorModalDesc">
+      <p><strong>نام:</strong> مصیب خانی</p>
+      <p><strong>موبایل:</strong> 09173206052</p>
+      <p><strong>ایمیل:</strong> Mosayeb872@gmail.vom</p>
+    </div>
+  </div>
+</div>
 
 <script>
   const MAX_FILES = 30;          // محدودیت تعداد فایل
@@ -420,6 +512,16 @@
   const manualCategorySelect = document.getElementById('manualCategorySelect');
   const manualFileContentTextarea = document.getElementById('manualFileContent');
   const manualAddBtn = document.getElementById('manualAddBtn');
+
+  // دکمه‌های مودال
+  const helpBtn = document.getElementById('helpBtn');
+  const authorInfoBtn = document.getElementById('authorInfoBtn');
+
+  const helpModal = document.getElementById('helpModal');
+  const authorModal = document.getElementById('authorModal');
+
+  // دکمه‌های بستن مودال‌ها
+  const closeModalButtons = document.querySelectorAll('.closeModalBtn');
 
   let currentSearchResults = [];
 
@@ -680,10 +782,37 @@
         editCategoryName(catTitle, cat);
       };
 
+      // دکمه جدید کپی محتوای دسته:
+      const copyCategoryBtn = document.createElement('button');
+      copyCategoryBtn.className = 'copyCategoryBtn';
+      copyCategoryBtn.textContent = 'کپی محتوای دسته';
+      copyCategoryBtn.title = `کپی محتوای تمام فایل‌های دسته "${cat}" به کلیپ‌بورد`;
+      copyCategoryBtn.style.backgroundColor = '#27ae60'; // سبز
+      copyCategoryBtn.style.marginLeft = '6px';
+      copyCategoryBtn.style.border = 'none';
+      copyCategoryBtn.style.color = 'white';
+      copyCategoryBtn.style.borderRadius = '8px';
+      copyCategoryBtn.style.padding = '6px 14px';
+      copyCategoryBtn.style.fontSize = '14px';
+      copyCategoryBtn.style.cursor = 'pointer';
+      copyCategoryBtn.style.transition = 'background-color 0.3s';
+      copyCategoryBtn.onmouseenter = () => copyCategoryBtn.style.backgroundColor = '#1e8449';
+      copyCategoryBtn.onmouseleave = () => copyCategoryBtn.style.backgroundColor = '#27ae60';
+
+      copyCategoryBtn.onclick = e => {
+        e.stopPropagation();
+        const texts = catFiles.map(f => `--- فایل: ${f.name} ---\n${f.content}`).join('\n\n');
+        navigator.clipboard.writeText(texts)
+          .then(() => alert(`محتوای تمام فایل‌های دسته "${cat}" کپی شد.`))
+          .catch(() => alert('خطا در کپی کردن محتوا.'));
+      };
+
       catHeader.appendChild(catTitle);
       catHeader.appendChild(fileCountSpan);
       catHeader.appendChild(arrowCat);
       catHeader.appendChild(delCatBtn);
+      catHeader.appendChild(copyCategoryBtn);
+
       catDiv.appendChild(catHeader);
 
       const catContent = document.createElement('div');
@@ -877,26 +1006,108 @@
     let htmlContent = `
       <!DOCTYPE html>
       <html lang="fa" dir="rtl">
-      <head><meta charset="UTF-8"><title>خروجی فایل‌ها</title>
-      <style>
-        body { font-family: Tahoma,sans-serif; background:#f5f5f5; padding:30px; color:#222; }
-        h2 { color:#1565c0; border-bottom:2px solid #1565c0; padding-bottom:6px; }
-        h3 { color:#34495e; margin-top:20px; }
-        pre { background:#fff; padding:15px; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.1); white-space:pre-wrap; word-break:break-word; font-family: monospace;}
-        .category { margin-bottom:40px; }
-      </style>
-      </head><body><h1>خروجی فایل‌های متنی</h1>
+      <head>
+        <meta charset="UTF-8">
+        <title>خروجی فایل‌ها</title>
+        <style>
+          body { font-family: Tahoma,sans-serif; background:#f5f5f5; padding:30px; color:#222; }
+          h2 { color:#1565c0; border-bottom:2px solid #1565c0; padding-bottom:6px; margin: 0; cursor: pointer; display: flex; align-items: center; }
+          h2 .arrow { margin-left: 10px; transition: transform 0.3s ease; }
+          h2.collapsed .arrow { transform: rotate(-90deg); }
+          .category { margin-bottom: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 10px 20px; }
+          .files-container { margin-top: 10px; }
+          .fileName { font-weight: 700; margin-top: 15px; color: #34495e; }
+          pre { background:#fff; padding:15px; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.1); white-space:pre-wrap; word-break:break-word; font-family: monospace; margin-top: 6px; }
+          #toggleAllBtn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 3px 6px rgba(52,152,219,0.6);
+            margin-bottom: 25px;
+            transition: background-color 0.3s;
+          }
+          #toggleAllBtn:hover {
+            background-color: #2874a6;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>خروجی فایل‌های متنی</h1>
+        <button id="toggleAllBtn" aria-pressed="true" aria-label="باز یا بسته کردن همه دسته‌ها">باز/بسته کردن همه دسته‌ها</button>
     `;
+
     [...categories].sort((a,b) => a.localeCompare(b)).forEach(cat => {
       const catFiles = files.filter(f => f.category === cat);
       if(catFiles.length === 0) return;
-      htmlContent += `<div class="category"><h2>${escapeHtml(cat)}</h2>`;
+      htmlContent += `<section class="category">
+        <h2 tabindex="0" role="button" aria-expanded="true">${escapeHtml(cat)}<span class="arrow">▼</span></h2>
+        <div class="files-container">
+      `;
       catFiles.forEach(file => {
-        htmlContent += `<h3>${escapeHtml(file.name)}</h3><pre>${escapeHtml(file.content)}</pre>`;
+        htmlContent += `<div class="fileName">${escapeHtml(file.name)}</div><pre>${escapeHtml(file.content)}</pre>`;
       });
-      htmlContent += `</div>`;
+      htmlContent += `</div></section>`;
     });
-    htmlContent += '</body></html>';
+
+    htmlContent += `
+      <script>
+        const toggleAllBtn = document.getElementById('toggleAllBtn');
+        const categories = document.querySelectorAll('.category');
+        let allOpen = true;
+
+        toggleAllBtn.addEventListener('click', () => {
+          allOpen = !allOpen;
+          categories.forEach(cat => {
+            const header = cat.querySelector('h2');
+            const content = cat.querySelector('.files-container');
+            if (allOpen) {
+              content.style.display = 'block';
+              header.setAttribute('aria-expanded', 'true');
+              header.classList.remove('collapsed');
+              header.querySelector('.arrow').textContent = '▼';
+            } else {
+              content.style.display = 'none';
+              header.setAttribute('aria-expanded', 'false');
+              header.classList.add('collapsed');
+              header.querySelector('.arrow').textContent = '▶';
+            }
+          });
+          toggleAllBtn.setAttribute('aria-pressed', allOpen.toString());
+        });
+
+        categories.forEach(cat => {
+          const header = cat.querySelector('h2');
+          const content = cat.querySelector('.files-container');
+          header.addEventListener('click', () => {
+            const isOpen = content.style.display !== 'none';
+            if (isOpen) {
+              content.style.display = 'none';
+              header.setAttribute('aria-expanded', 'false');
+              header.classList.add('collapsed');
+              header.querySelector('.arrow').textContent = '▶';
+            } else {
+              content.style.display = 'block';
+              header.setAttribute('aria-expanded', 'true');
+              header.classList.remove('collapsed');
+              header.querySelector('.arrow').textContent = '▼';
+            }
+          });
+          header.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              header.click();
+            }
+          });
+        });
+      <\/script>
+      </body>
+      </html>
+    `;
+
     downloadFile('output.html', htmlContent, 'text/html');
   };
 
@@ -1089,6 +1300,50 @@
     manualCategorySelect.value = '';
     manualFileContentTextarea.value = '';
   };
+
+  // مودال‌ها
+  helpBtn.addEventListener('click', () => {
+    helpModal.classList.add('active');
+  });
+
+  authorInfoBtn.addEventListener('click', () => {
+    authorModal.classList.add('active');
+  });
+
+  closeModalButtons.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.target.closest('.modalOverlay').classList.remove('active');
+    });
+  });
+
+  [helpModal, authorModal].forEach(modal => {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (helpModal.classList.contains('active')) {
+        helpModal.classList.remove('active');
+      }
+      if (authorModal.classList.contains('active')) {
+        authorModal.classList.remove('active');
+      }
+    }
+  });
+
+  // تغییر فونت
+  const fontSelect = document.getElementById('fontSelect');
+  fontSelect.addEventListener('change', () => {
+    document.body.style.fontFamily = fontSelect.value;
+  });
+
+  // شروع رندر اولیه
+  renderFiles();
+  updateInfoSummary();
 
 </script>
 
