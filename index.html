@@ -361,6 +361,21 @@
   <input type="file" id="fileInput" accept=".txt,.bat,.css,.js" multiple aria-label="انتخاب فایل‌ها" />
 </section>
 
+<!-- بخش جدید برای وارد کردن دستی متن -->
+<section id="manualAddSection" aria-label="افزودن فایل به صورت دستی" style="max-width: 900px; width: 100%; margin-bottom: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+  <h2>افزودن فایل به صورت دستی</h2>
+  <label for="manualFileName">نام فایل:</label>
+  <input type="text" id="manualFileName" placeholder="مثلاً script.js" aria-label="نام فایل" style="width: 100%; max-width: 400px; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 2px solid #ccc; font-size: 16px;" />
+  
+  <label for="manualCategorySelect">دسته‌بندی:</label>
+  <input list="categoriesDatalist" id="manualCategorySelect" placeholder="انتخاب یا وارد کردن دسته‌بندی جدید" autocomplete="off" aria-label="دسته‌بندی فایل‌ها" style="width: 100%; max-width: 400px; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 2px solid #3498db; font-size: 16px;" />
+
+  <label for="manualFileContent">محتوای فایل:</label>
+  <textarea id="manualFileContent" rows="8" placeholder="محتوای فایل را اینجا وارد کنید..." aria-label="محتوای فایل" style="width: 100%; max-width: 900px; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 2px solid #ccc; font-family: monospace; font-size: 15px; resize: vertical;"></textarea>
+  
+  <button id="manualAddBtn" style="background-color: #3498db; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; box-shadow: 0 3px 6px rgba(52,152,219,0.6); transition: background-color 0.3s;">افزودن فایل</button>
+</section>
+
 <section id="filesList" aria-live="polite" aria-label="لیست دسته‌بندی‌ها و فایل‌ها" style="max-width: 900px; width: 100%; margin: 0 auto;">
   <!-- فایل‌ها اینجا ظاهر می‌شوند -->
 </section>
@@ -399,6 +414,12 @@
   const searchInput = document.getElementById('searchInput');
   const searchResults = document.getElementById('searchResults');
   const infoSummary = document.getElementById('infoSummary');
+
+  // بخش جدید برای وارد کردن دستی
+  const manualFileNameInput = document.getElementById('manualFileName');
+  const manualCategorySelect = document.getElementById('manualCategorySelect');
+  const manualFileContentTextarea = document.getElementById('manualFileContent');
+  const manualAddBtn = document.getElementById('manualAddBtn');
 
   let currentSearchResults = [];
 
@@ -1012,6 +1033,62 @@
     reader.readAsText(file);
     e.target.value = ''; // پاک کردن انتخاب فایل
   });
+
+  // افزودن فایل به صورت دستی
+  manualAddBtn.onclick = () => {
+    const name = manualFileNameInput.value.trim();
+    let category = manualCategorySelect.value.trim();
+    const content = manualFileContentTextarea.value;
+
+    if (!name) {
+      alert('لطفا نام فایل را وارد کنید.');
+      manualFileNameInput.focus();
+      return;
+    }
+    // بررسی فرمت فایل
+    const ext = name.split('.').pop().toLowerCase();
+    if (!['txt', 'bat', 'css', 'js'].includes(ext)) {
+      alert('پسوند فایل باید یکی از موارد txt، bat، css، js باشد.');
+      manualFileNameInput.focus();
+      return;
+    }
+
+    if (!category) category = 'دسته‌بندی نشده';
+
+    // بررسی تکراری بودن نام فایل در دسته
+    if (files.some(f => f.category === category && f.name === name)) {
+      alert('نام فایل در این دسته‌بندی تکراری است.');
+      manualFileNameInput.focus();
+      return;
+    }
+
+    if (content.length > MAX_FILE_SIZE) {
+      alert('حجم محتوای فایل بیش از 3 مگابایت است.');
+      manualFileContentTextarea.focus();
+      return;
+    }
+
+    if (files.length >= MAX_FILES) {
+      alert(`حداکثر تعداد فایل‌ها ${MAX_FILES} است.`);
+      return;
+    }
+
+    files.push({
+      id: fileIdCounter++,
+      name: name,
+      content: content,
+      category: category
+    });
+    categories.add(category);
+    updateCategoryDatalist();
+    renderFiles();
+    doSearch();
+    updateInfoSummary();
+
+    manualFileNameInput.value = '';
+    manualCategorySelect.value = '';
+    manualFileContentTextarea.value = '';
+  };
 
 </script>
 
