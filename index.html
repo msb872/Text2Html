@@ -1,1410 +1,1558 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Text2Html</title>
-<link rel="icon" type="image/png" href="Text2Html.png">
+<title>Text2Html - نسخه کامل با خروجی HTML بازوبسته شونده</title>
+<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
 <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --primary-light: #1565c0;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #333;
+    --text-light: #666;
+    --border: #ddd;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --radius: 10px;
+    --header-bg: #ffffff;
+    --danger: #e74c3c;
+    --success: #27ae60;
+    --warning: #f39c12;
+  }
+
   body {
     font-family: Tahoma, sans-serif;
-    margin: 0; padding: 20px;
-    background: #f0f4f8;
-    color: #333;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
+    direction: rtl;
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--header-bg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px 20px;
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
     align-items: center;
-  }
-  h1 {
-    margin-bottom: 20px;
-    color: #2c3e50;
-  }
-  #topButtonsContainer {
-    margin-bottom: 15px;
-    display: flex;
+    justify-content: space-between;
+    gap: 10px;
     flex-wrap: wrap;
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--primary-light);
+    white-space: nowrap;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .header-buttons button, .header-buttons label {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    background: var(--primary);
+    color: white;
+    transition: 0.2s;
+    white-space: nowrap;
+  }
+
+  .header-buttons button:hover, .header-buttons label:hover {
+    background: var(--primary-dark);
+  }
+
+  .header-buttons .danger { background: var(--danger); }
+  .header-buttons .success { background: var(--success); }
+
+  .font-select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+  }
+
+  .font-select select {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .main {
+    max-width: 1000px;
+    margin: 70px auto 0;
+    padding: 20px;
+  }
+
+  .info-bar {
+    background: var(--card);
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: var(--primary-light);
+    text-align: center;
+  }
+
+  .drop-area {
+    border: 2px dashed var(--border);
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: 0.3s;
+  }
+
+  .drop-area.dragover {
+    border-color: var(--primary);
+    background: #e8f4fd;
+  }
+
+  .drop-area p {
+    margin-bottom: 15px;
+    color: var(--text-light);
+  }
+
+  .drop-controls {
+    display: flex;
+    align-items: center;
     justify-content: center;
     gap: 10px;
+    flex-wrap: wrap;
   }
-  #topButtonsContainer button,
-  #topButtonsContainer input[type="file"] {
-    background-color: #3498db;
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
+
+  .drop-controls input[type="text"] {
+    padding: 8px 12px;
+    border: 2px solid var(--primary);
+    border-radius: 6px;
     font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(52,152,219,0.6);
-    transition: background-color 0.3s;
-  }
-  #topButtonsContainer button:hover {
-    background-color: #2874a6;
-  }
-  #topButtonsContainer input[type="file"] {
-    cursor: pointer;
-    padding: 6px 12px;
-    color: transparent;
-    width: 130px;
-  }
-  #topButtonsContainer label {
-    cursor: pointer;
-    user-select: none;
-    background-color: #3498db;
-    padding: 8px 16px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    box-shadow: 0 3px 6px rgba(52,152,219,0.6);
-    transition: background-color 0.3s;
-  }
-  #topButtonsContainer label:hover {
-    background-color: #2874a6;
-  }
-  #infoSummary {
-    max-width: 900px;
-    margin-bottom: 15px;
-    font-weight: 700;
-    color: #1565c0;
-  }
-  #addArea {
-    border: 2px dashed #bbb;
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    max-width: 900px;
-    width: 100%;
-    text-align: center;
-    color: #666;
-    user-select: none;
-    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-  }
-  #addArea.dragover {
-    border-color: #3498db;
-    background-color: #e3f2fd;
-    color: #1565c0;
-  }
-  #addArea p {
-    font-size: 16px;
-    margin: 10px 0 14px;
-  }
-  #categorySelect {
-    border: 2px solid #3498db;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 16px;
-    width: 250px;
+    width: 200px;
     outline: none;
-    transition: border-color 0.3s;
   }
-  #categorySelect:focus {
-    border-color: #1565c0;
-    box-shadow: 0 0 8px #a6c8ff;
-  }
-  #selectFileBtn, #addFileBtn {
-    background-color: #3498db;
-    color: white;
+
+  .drop-controls button {
+    padding: 8px 18px;
     border: none;
-    padding: 9px 20px;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-left: 10px;
-    box-shadow: 0 3px 6px rgba(52,152,219,0.6);
-    transition: background-color 0.3s;
+    font-size: 14px;
+    background: var(--primary);
+    color: white;
+    transition: 0.2s;
   }
-  #selectFileBtn:hover, #addFileBtn:hover {
-    background-color: #2874a6;
+
+  .drop-controls button:hover {
+    background: var(--primary-dark);
   }
-  #fileInput {
-    display: none;
+
+  .manual-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
   }
-  .category {
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 22px;
-    padding: 14px 20px;
-    max-width: 900px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  .manual-section h3 {
+    color: var(--primary-light);
+    margin-bottom: 15px;
   }
+
+  .manual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .manual-grid label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .manual-grid input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .manual-grid input:focus {
+    border-color: var(--primary);
+  }
+
+  .manual-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: monospace;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+    margin-bottom: 15px;
+  }
+
+  .manual-section textarea:focus {
+    border-color: var(--primary);
+  }
+
+  .manual-section button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    background: var(--primary);
+    color: white;
+    transition: 0.2s;
+  }
+
+  .manual-section button:hover {
+    background: var(--primary-dark);
+  }
+
+  .category-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
   .category-header {
     display: flex;
     align-items: center;
+    padding: 12px 18px;
     cursor: pointer;
     user-select: none;
+    gap: 10px;
+    flex-wrap: wrap;
   }
+
   .category-header .arrow {
-    font-size: 20px;
-    margin-left: 12px;
-    transition: transform 0.3s ease;
+    font-size: 14px;
+    transition: 0.3s;
+    color: var(--primary);
   }
+
   .category-header .arrow.collapsed {
     transform: rotate(-90deg);
   }
+
   .category-header h2 {
-    flex-grow: 1;
-    margin: 0;
-    font-weight: 700;
-    color: #1565c0;
-    user-select: text;
+    flex: 1;
+    font-size: 17px;
+    color: var(--primary-light);
+    cursor: text;
   }
-  .category-header .file-count {
-    font-size: 14px;
-    color: #555;
-    margin-left: 10px;
+
+  .category-header .count {
+    font-size: 13px;
+    color: var(--text-light);
+    background: var(--bg);
+    padding: 2px 10px;
+    border-radius: 20px;
   }
-  .category-header button.deleteCategoryBtn {
-    background-color: #e74c3c;
-    border: none;
-    color: white;
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 14px;
+
+  .category-header .cat-actions button {
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 12px;
+    transition: 0.2s;
   }
-  .category-header button.deleteCategoryBtn:hover {
-    background-color: #b93026;
+
+  .category-header .cat-actions button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
   }
+
+  .category-header .cat-actions .danger:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
   .files-container {
-    margin-top: 14px;
-    border-left: 4px solid #1565c0;
-    padding-left: 16px;
+    padding: 0 18px 14px;
+    border-right: 3px solid var(--primary-light);
+    margin-right: 18px;
   }
-  .fileItem {
-    background: #f9fbfd;
-    margin-bottom: 14px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+
+  .file-item {
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
   }
-  .fileTitle {
+
+  .file-header {
     display: flex;
     align-items: center;
-    padding: 10px 16px;
-    font-weight: 600;
+    padding: 8px 14px;
     cursor: pointer;
-    user-select: none;
+    gap: 8px;
+    flex-wrap: wrap;
   }
-  .fileTitle .arrow {
-    font-size: 16px;
-    margin-left: 10px;
-    transition: transform 0.3s ease;
+
+  .file-header .arrow {
+    font-size: 12px;
+    transition: 0.3s;
+    color: var(--primary);
   }
-  .fileTitle .arrow.open {
+
+  .file-header .arrow.open {
     transform: rotate(90deg);
   }
-  .fileTitle span.fileName {
-    flex-grow: 1;
-    user-select: text;
+
+  .file-header .fname {
+    flex: 1;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: text;
   }
-  .fileTitle button.deleteFileBtn,
-  .fileTitle button.copyFileBtn {
-    background-color: #3498db;
+
+  .file-header .file-actions {
+    display: flex;
+    gap: 5px;
+  }
+
+  .file-header .file-actions button {
+    padding: 4px 10px;
     border: none;
-    color: white;
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 13px;
+    border-radius: 5px;
     cursor: pointer;
-    margin-left: 6px;
-    transition: background-color 0.3s;
+    font-size: 12px;
+    background: var(--primary);
+    color: white;
+    transition: 0.2s;
   }
-  .fileTitle button.deleteFileBtn:hover {
-    background-color: #e74c3c;
+
+  .file-header .file-actions button:hover {
+    background: var(--primary-dark);
   }
-  .fileTitle button.copyFileBtn:hover {
-    background-color: #2874a6;
-  }
-  .fileContent {
+
+  .file-header .file-actions .success { background: var(--success); }
+  .file-header .file-actions .danger { background: var(--danger); }
+  .file-header .file-actions .warning { background: var(--warning); color:#333; }
+
+  .file-content {
     display: none;
-    background: white;
-    border-top: 2px solid #1565c0;
-    padding: 14px 18px 20px 18px;
-    border-radius: 0 0 12px 12px;
+    padding: 10px 14px 14px;
+    border-top: 2px solid var(--primary-light);
   }
-  .fileContent textarea {
+
+  .file-content textarea {
     width: 100%;
-    height: 140px;
-    font-family: monospace;
-    font-size: 15px;
-    border-radius: 8px;
-    border: 1.5px solid #ccc;
+    height: 120px;
     padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 13px;
     resize: vertical;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
-  }
-  .fileContent textarea:focus {
-    border-color: #1565c0;
     outline: none;
-    box-shadow: 0 0 8px #a6c8ff;
   }
-  #searchSection {
-    max-width: 900px;
-    width: 100%;
-    margin: 40px auto 60px auto;
-    background: white;
-    border-radius: 14px;
-    padding: 20px 25px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+
+  .file-content textarea:focus {
+    border-color: var(--primary);
   }
-  #searchSection h2 {
-    margin-top: 0;
-    color: #2c3e50;
-    margin-bottom: 16px;
+
+  .file-content .content-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
   }
-  #searchInput {
+
+  .file-content .content-actions button {
+    padding: 5px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    background: var(--primary);
+    color: white;
+    transition: 0.2s;
+  }
+
+  .file-content .content-actions button:hover {
+    background: var(--primary-dark);
+  }
+
+  .search-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 20px 0 40px;
+    box-shadow: var(--shadow);
+  }
+
+  .search-section h3 {
+    color: var(--primary-light);
+    margin-bottom: 12px;
+  }
+
+  .search-section input {
     width: 100%;
     max-width: 400px;
     padding: 10px 14px;
-    border-radius: 10px;
-    border: 2px solid #ccc;
-    font-size: 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
     outline: none;
-    transition: border-color 0.3s;
   }
-  #searchInput:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 10px #a6c8ff;
+
+  .search-section input:focus {
+    border-color: var(--primary);
   }
-  #searchResults {
-    margin-top: 20px;
-    max-height: 280px;
+
+  .search-results {
+    margin-top: 15px;
+    max-height: 300px;
     overflow-y: auto;
-    background: #fafafa;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 14px 18px;
-    white-space: pre-wrap;
-    word-break: break-word;
-    font-size: 15px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
   }
-  #searchResults div {
-    border-bottom: 1px solid #e0e0e0;
-    padding: 10px 0;
+
+  .search-results div {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
   }
-  #searchResults div:last-child {
+
+  .search-results div:last-child {
     border-bottom: none;
   }
+
   mark {
-    background-color: #fff59d;
+    background: #fff59d;
     color: #7b6f00;
-    font-weight: 700;
-    border-radius: 3px;
     padding: 0 3px;
+    border-radius: 3px;
   }
-  input.inlineEdit {
-    font-size: 16px;
-    font-family: inherit;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 2px solid #3498db;
-    outline: none;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  input.inlineEdit:focus {
-    border-color: #1565c0;
-    box-shadow: 0 0 8px #a6c8ff;
-  }
-  /* استایل مودال */
-  .modalOverlay {
+
+  .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 2000;
     left: 0; top: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.4);
     justify-content: center;
     align-items: center;
   }
-  .modalOverlay.active {
+
+  .modal.active {
     display: flex;
   }
-  .modalContent {
-    background: white;
-    border-radius: 12px;
-    max-width: 400px;
+
+  .modal-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    max-width: 450px;
     width: 90%;
-    padding: 20px 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    padding: 25px;
     position: relative;
-    font-size: 16px;
-    line-height: 1.5;
-    color: #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
-  .modalContent h3 {
-    margin-top: 0;
-    color: #1565c0;
+
+  .modal-content h3 {
+    color: var(--primary-light);
+    margin-bottom: 15px;
   }
-  .closeModalBtn {
+
+  .modal-content .close {
     position: absolute;
-    top: 12px;
-    right: 16px;
-    background: transparent;
-    border: none;
-    font-size: 22px;
-    font-weight: bold;
+    top: 10px;
+    left: 15px;
+    font-size: 24px;
     cursor: pointer;
-    color: #888;
-    transition: color 0.3s;
+    background: none;
+    border: none;
+    color: var(--text-light);
   }
-  .closeModalBtn:hover {
-    color: #3498db;
+
+  .modal-content ul {
+    padding-right: 20px;
+    line-height: 1.8;
   }
-  @media (max-width: 640px) {
-    #topButtonsContainer {
-      flex-direction: column;
-      gap: 8px;
-    }
-    #categorySelect {
-      width: 100%;
-      max-width: none;
-      margin-bottom: 12px;
-      margin-left: 0 !important;
-    }
-    #selectFileBtn, #addFileBtn {
-      margin-left: 0 !important;
-      width: 100%;
-      max-width: none;
-    }
-    .category {
-      padding: 12px 16px;
-    }
-    .fileContent textarea {
-      height: 120px;
-    }
+
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .toast {
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+  .toast.warning { background: var(--warning); color: #333; }
+
+  .inline-edit {
+    padding: 4px 8px;
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  @media (max-width: 700px) {
+    .header-inner { flex-direction: column; align-items: stretch; }
+    .header-buttons { justify-content: center; }
+    .main { margin-top: 120px; padding: 12px; }
+    .manual-grid { grid-template-columns: 1fr; }
   }
 </style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+</script>
 
 </head>
 <body>
 
-<h1>Text2Html</h1>
-
-<div style="max-width: 900px; width: 100%; margin-bottom: 25px; text-align: center;">
-  <label for="fontSelect" style="font-weight: 700; color: #1565c0; margin-left: 10px;">انتخاب فونت:</label>
-  <select id="fontSelect" aria-label="انتخاب فونت" style="padding: 6px 12px; font-size: 16px; border-radius: 8px; border: 2px solid #3498db; outline: none; min-width: 180px;">
-    <option value="Tahoma, sans-serif" selected>Tahoma</option>
-    <option value="'Arial', sans-serif">Arial</option>
-    <option value="'Courier New', monospace">Courier New</option>
-    <option value="'Times New Roman', serif">Times New Roman</option>
-    <option value="'Segoe UI', sans-serif">Segoe UI</option>
-    <option value="'Verdana', sans-serif">Verdana</option>
-  </select>
-</div>
-
-<div id="topButtonsContainer" aria-label="دکمه‌های عملیات">
-  <button id="toggleAllCategoriesBtn" title="باز/بسته کردن همه دسته‌ها (کلید میانبر: A)">باز/بسته کردن همه دسته‌ها</button>
-  <button id="exportHTMLBtn" title="خروجی HTML">خروجی HTML</button>
-  <button id="saveFilesBtn" title="ذخیره همه فایل‌ها">ذخیره فایل‌ها</button>
-  <button id="saveSearchResultsBtn" title="ذخیره نتایج جستجو">ذخیره نتایج جستجو</button>
-  <button id="saveFilesWithSearchResultsBtn" title="ذخیره فایل‌های دارای نتیجه">ذخیره فایل‌های دارای نتیجه</button>
-  <button id="exportZIPBtn" title="خروجی ZIP فایل‌ها">خروجی ZIP فایل‌ها</button>
-  <label for="importJSON">وارد کردن JSON</label>
-  <input type="file" id="importJSON" accept=".json" style="display:none" aria-label="وارد کردن فایل JSON" />
-  <button id="exportJSONBtn" title="خروجی JSON">خروجی JSON</button>
-  <button id="helpBtn" title="نمایش فایل راهنما">راهنما</button>
-  <button id="authorInfoBtn" title="مشخصات نویسنده">مشخصات نویسنده</button>
-</div>
-
-<div id="infoSummary" aria-live="polite" aria-atomic="true">
-  فایل‌ها: 0 | دسته‌ها: 0
-</div>
-
-<section id="addArea" aria-label="افزودن فایل‌ها و دسته‌بندی">
-  <p>فایل‌های TXT, BAT, CSS و JS را اینجا بکشید و رها کنید یا از دکمه انتخاب فایل استفاده کنید</p>
-  <label for="categorySelect">دسته‌بندی:</label>
-  <input list="categoriesDatalist" id="categorySelect" placeholder="انتخاب یا وارد کردن دسته‌بندی جدید" autocomplete="off" aria-label="دسته‌بندی فایل‌ها" />
-  <datalist id="categoriesDatalist"></datalist>
-  <button id="selectFileBtn" aria-label="انتخاب فایل‌ها">انتخاب فایل‌ها</button>
-  <button id="addFileBtn" aria-label="افزودن فایل‌ها">افزودن فایل‌ها</button>
-  <input type="file" id="fileInput" accept=".txt,.bat,.css,.js" multiple aria-label="انتخاب فایل‌ها" />
-</section>
-
-<section id="manualAddSection" aria-label="افزودن فایل به صورت دستی" style="max-width: 900px; width: 100%; margin-bottom: 40px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-  <h2>افزودن فایل به صورت دستی</h2>
-  <label for="manualFileName">نام فایل:</label>
-  <input type="text" id="manualFileName" placeholder="مثلاً script.js" aria-label="نام فایل" style="width: 100%; max-width: 400px; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 2px solid #ccc; font-size: 16px;" />
-  
-  <label for="manualCategorySelect">دسته‌بندی:</label>
-  <input list="categoriesDatalist" id="manualCategorySelect" placeholder="انتخاب یا وارد کردن دسته‌بندی جدید" autocomplete="off" aria-label="دسته‌بندی فایل‌ها" style="width: 100%; max-width: 400px; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 2px solid #3498db; font-size: 16px;" />
-
-  <label for="manualFileContent">محتوای فایل:</label>
-  <textarea id="manualFileContent" rows="8" placeholder="محتوای فایل را اینجا وارد کنید..." aria-label="محتوای فایل" style="width: 100%; max-width: 900px; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 2px solid #ccc; font-family: monospace; font-size: 15px; resize: vertical;"></textarea>
-  
-  <button id="manualAddBtn" style="background-color: #3498db; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; box-shadow: 0 3px 6px rgba(52,152,219,0.6); transition: background-color 0.3s;">افزودن فایل</button>
-</section>
-
-<section id="filesList" aria-live="polite" aria-label="لیست دسته‌بندی‌ها و فایل‌ها" style="max-width: 900px; width: 100%; margin: 0 auto;">
-  <!-- فایل‌ها اینجا ظاهر می‌شوند -->
-</section>
-
-<section id="searchSection" aria-label="بخش جستجو" style="max-width: 900px; width: 100%; margin: 40px auto 60px auto;">
-  <h2>جستجو در محتوای فایل‌ها</h2>
-  <input type="search" id="searchInput" placeholder="عبارت مورد نظر را وارد کنید" aria-label="عبارت جستجو" autocomplete="off" />
-  <div id="searchResults" aria-live="polite" role="region" aria-atomic="true">عبارتی وارد نشده است.</div>
-</section>
-
-<div id="helpModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle" aria-describedby="helpModalDesc">
-  <div class="modalContent">
-    <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
-    <h3 id="helpModalTitle">راهنمای استفاده از Text2Html</h3>
-    <div id="helpModalDesc">
-      <p>در این برنامه می‌توانید فایل‌های متنی با فرمت‌های txt, bat, css و js را اضافه کنید، آن‌ها را دسته‌بندی نمایید و محتوای آن‌ها را مشاهده و ویرایش کنید.</p>
-      <ul>
-        <li>برای افزودن فایل‌ها از طریق درگ و دراپ یا دکمه انتخاب فایل استفاده کنید.</li>
-        <li>می‌توانید فایل جدید به صورت دستی با وارد کردن نام، دسته‌بندی و محتوا اضافه کنید.</li>
-        <li>از دکمه‌های بالای صفحه برای خروجی گرفتن، ذخیره فایل‌ها و جستجو استفاده نمایید.</li>
-        <li>نام دسته‌بندی و فایل‌ها قابل ویرایش هستند.</li>
-        <li>برای باز و بسته کردن دسته‌بندی‌ها از دکمه «باز/بسته کردن همه دسته‌ها» استفاده کنید.</li>
-	<li><strong>جستجو:</strong> در بخش جستجو می‌توانید عبارتی را وارد کنید تا در محتوای تمامی فایل‌ها جستجو شود. نتایج شامل نام فایل، دسته‌بندی و خطی از متن که عبارت در آن وجود دارد نمایش داده می‌شود. با پاک کردن عبارت جستجو (کلید Escape) نتایج پاک می‌شود.</li>
-
-      </ul>
-      <p>امیدواریم این ابزار برای شما مفید باشد!</p>
+<!-- ===== هدر ===== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-title">📄 Text2Html</div>
+    
+    <div class="font-select">
+      <span>فونت:</span>
+      <select id="fontSelect">
+        <option value="Tahoma, sans-serif">Tahoma</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Courier New, monospace">Courier New</option>
+        <option value="Times New Roman, serif">Times New Roman</option>
+        <option value="Segoe UI, sans-serif">Segoe UI</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+      </select>
     </div>
+
+    <div class="header-buttons">
+      <button id="toggleAllBtn">📂 همه</button>
+      <button id="exportHtmlBtn">🌐 HTML</button>
+      <button id="exportJsonBtn">📋 خروجی JSON</button>
+      <label for="importJsonInput" style="cursor:pointer">📥 ورودی JSON</label>
+      <input type="file" id="importJsonInput" accept=".json" style="display:none">
+      <button id="exportZipBtn">📦 ZIP</button>
+      <button id="saveFilesBtn">💾 ذخیره</button>
+      <button id="clearAllBtn" class="danger">🗑️ پاک کردن همه</button>
+      <button id="undoBtn" disabled>↩️ بازگردانی</button>
+      <button id="darkToggle" style="background:transparent;border:1px solid #aaa;color:#333">🌙</button>
+      <button id="helpBtn" style="background:#eee;color:#333">❓</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== محتوای اصلی ===== -->
+<div class="main">
+
+  <div class="info-bar" id="infoBar">فایل‌ها: 0 | دسته‌ها: 0</div>
+
+  <!-- Drop Area -->
+  <div class="drop-area" id="dropArea">
+    <p>📂 فایل‌های خود را اینجا بکشید و رها کنید</p>
+    <div class="drop-controls">
+      <input type="text" id="catInput" list="catList" placeholder="دسته‌بندی...">
+      <datalist id="catList"></datalist>
+      <button id="selectFilesBtn">📎 انتخاب فایل‌ها</button>
+      <button id="addFilesBtn">➕ افزودن</button>
+      <input type="file" id="fileInput" accept=".txt,.bat,.css,.js,.html,.json,.xml,.md,.csv,.log" multiple style="display:none">
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:8px">فرمت‌ها: txt, bat, css, js, html, json, xml, md, csv, log</p>
+  </div>
+
+  <!-- Manual Add -->
+  <div class="manual-section">
+    <h3>✏️ افزودن فایل دستی</h3>
+    <div class="manual-grid">
+      <div>
+        <label for="manualName">نام فایل:</label>
+        <input type="text" id="manualName" placeholder="مثلاً script.js">
+      </div>
+      <div>
+        <label for="manualCat">دسته‌بندی:</label>
+        <input type="text" id="manualCat" list="catList" placeholder="انتخاب یا ایجاد">
+      </div>
+    </div>
+    <label for="manualContent">محتوای فایل:</label>
+    <textarea id="manualContent" placeholder="محتوای فایل را وارد کنید..."></textarea>
+    <button id="manualAddBtn">➕ افزودن فایل دستی</button>
+  </div>
+
+  <!-- Files List -->
+  <div id="filesList"></div>
+
+  <!-- Search -->
+  <div class="search-section">
+    <h3>🔍 جستجو در محتوای فایل‌ها</h3>
+    <input type="text" id="searchInput" placeholder="عبارت جستجو..." autocomplete="off">
+    <div class="search-results" id="searchResults">
+      <p style="color:#888">عبارتی وارد نشده است.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== مودال‌ها ===== -->
+<div class="modal" id="helpModal">
+  <div class="modal-content">
+    <button class="close" id="closeHelp">&times;</button>
+    <h3>📖 راهنما</h3>
+    <ul>
+      <li><b>افزودن فایل:</b> کشیدن و رها کردن یا دکمه انتخاب فایل</li>
+      <li><b>فرمت‌ها:</b> txt, bat, css, js, html, json, xml, md, csv, log</li>
+      <li><b>دسته‌بندی:</b> می‌توانید دسته جدید ایجاد کنید</li>
+      <li><b>ویرایش:</b> روی نام دسته یا فایل کلیک کنید</li>
+      <li><b>میانبر:</b> A = باز/بسته کردن همه، Ctrl+Z = بازگردانی</li>
+      <li><b>خروجی:</b> HTML, JSON, ZIP, ذخیره فایل‌ها</li>
+      <li><b>جستجو:</b> با تایپ عبارت، نتایج نمایش داده می‌شود</li>
+      <li><b>پرینت و کپی:</b> در خروجی HTML دکمه‌های مجزا برای هر فایل و دسته</li>
+      <li><b>باز و بسته شدن:</b> روی عنوان دسته کلیک کنید تا محتوای آن باز/بسته شود</li>
+    </ul>
   </div>
 </div>
 
-<div id="authorModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="authorModalTitle" aria-describedby="authorModalDesc">
-  <div class="modalContent">
-    <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
-    <h3 id="authorModalTitle">مشخصات نویسنده</h3>
-    <div id="authorModalDesc">
-      <p><strong>نویسنده:</strong> مصیب خانی</p>
-      <p><strong>تماس با ما:</strong> 09173206052</p>
-      <p><strong>ایمیل:</strong> Mosayeb872@gmail.com</p>
-    </div>
+<div class="modal" id="authorModal">
+  <div class="modal-content">
+    <button class="close" id="closeAuthor">&times;</button>
+    <h3>👤 نویسنده</h3>
+    <p><b>نام:</b> مصیب خانی</p>
+    <p><b>تلفن:</b> ۰۹۱۷۳۲۰۶۰۵۲</p>
+    <p><b>ایمیل:</b> Mosayeb872@gmail.com</p>
+    <p><b>نسخه:</b> ۴.۰ (نهایی)</p>
   </div>
 </div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-  const MAX_FILES = 100;          // محدودیت تعداد فایل
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // محدودیت حجم هر فایل (5 مگابایت)
+// ===== تنظیمات =====
+const MAX_FILES = 500;
+const MAX_SIZE = 10 * 1024 * 1024;
+const ACCEPTED = ['txt','bat','css','js','html','json','xml','md','csv','log'];
 
-  let files = [];
-  let fileIdCounter = 1;
-  let categories = new Set();
-  let categoryOpenState = {};
+let files = [];
+let idCounter = 1;
+let categories = new Set();
+let openStates = {};
+let undoData = null;
+let searchResults = [];
 
-  const fileInput = document.getElementById('fileInput');
-  const categorySelect = document.getElementById('categorySelect');
-  const addFileBtn = document.getElementById('addFileBtn');
-  const selectFileBtn = document.getElementById('selectFileBtn');
-  const filesList = document.getElementById('filesList');
-  const categoriesDatalist = document.getElementById('categoriesDatalist');
+// ===== المان‌ها =====
+const $ = id => document.getElementById(id);
+const dropArea = $('dropArea');
+const fileInput = $('fileInput');
+const catInput = $('catInput');
+const catList = $('catList');
+const filesList = $('filesList');
+const infoBar = $('infoBar');
+const searchInput = $('searchInput');
+const searchResultsDiv = $('searchResults');
+const toastContainer = $('toastContainer');
 
-  const exportHTMLBtn = document.getElementById('exportHTMLBtn');
-  const saveFilesBtn = document.getElementById('saveFilesBtn');
-  const saveSearchResultsBtn = document.getElementById('saveSearchResultsBtn');
-  const saveFilesWithSearchResultsBtn = document.getElementById('saveFilesWithSearchResultsBtn');
-  const exportZIPBtn = document.getElementById('exportZIPBtn');
-  const toggleAllCategoriesBtn = document.getElementById('toggleAllCategoriesBtn');
-  const importJSONInput = document.getElementById('importJSON');
-  const exportJSONBtn = document.getElementById('exportJSONBtn');
+// ===== توابع پایه =====
 
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-  const infoSummary = document.getElementById('infoSummary');
+function escapeHtml(t) {
+  if (!t) return '';
+  return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
+}
 
-  // بخش جدید برای وارد کردن دستی
-  const manualFileNameInput = document.getElementById('manualFileName');
-  const manualCategorySelect = document.getElementById('manualCategorySelect');
-  const manualFileContentTextarea = document.getElementById('manualFileContent');
-  const manualAddBtn = document.getElementById('manualAddBtn');
+function toast(msg, type = 'info', dur = 2500) {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  toastContainer.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, dur);
+}
 
-  // دکمه‌های مودال
-  const helpBtn = document.getElementById('helpBtn');
-  const authorInfoBtn = document.getElementById('authorInfoBtn');
+function updateInfo() {
+  infoBar.textContent = `📊 فایل‌ها: ${files.length} | دسته‌ها: ${categories.size}`;
+}
 
-  const helpModal = document.getElementById('helpModal');
-  const authorModal = document.getElementById('authorModal');
-
-  // دکمه‌های بستن مودال‌ها
-  const closeModalButtons = document.querySelectorAll('.closeModalBtn');
-
-  let currentSearchResults = [];
-
-  // توابع کمکی
-
-  function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, m => {
-      return {'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'}[m];
-    });
-  }
-
-  function updateInfoSummary() {
-    infoSummary.textContent = `فایل‌ها: ${files.length} | دسته‌ها: ${categories.size}`;
-  }
-
-  function updateCategoryDatalist() {
-    categoriesDatalist.innerHTML = '';
-    [...categories].sort((a,b) => a.localeCompare(b)).forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      categoriesDatalist.appendChild(option);
-    });
-  }
-
-  function addFiles(fileList) {
-    if (files.length + fileList.length > MAX_FILES) {
-      alert(`حداکثر تعداد فایل مجاز ${MAX_FILES} است.`);
-      return;
-    }
-
-    let category = categorySelect.value.trim();
-    if (!category) category = 'دسته‌بندی نشده';
-    categories.add(category);
-
-    if (fileList.length === 0) {
-      alert('لطفا حداقل یک فایل انتخاب کنید.');
-      return;
-    }
-
-    let filesReadCount = 0;
-
-    function checkAllRead() {
-      if(filesReadCount === fileList.length) {
-        updateCategoryDatalist();
-        renderFiles();
-        categorySelect.value = '';
-        fileInput.value = '';
-        doSearch();
-        updateInfoSummary();
-      }
-    }
-
-    Array.from(fileList).forEach(file => {
-      const ext = file.name.split('.').pop().toLowerCase();
-
-      if (['txt','bat','css','js'].includes(ext)) {
-        if (file.size > MAX_FILE_SIZE) {
-          alert(`حجم فایل ${file.name} بیشتر از 3 مگابایت است و اضافه نمی‌شود.`);
-          filesReadCount++;
-          checkAllRead();
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = e => {
-          files.push({
-            id: fileIdCounter++,
-            name: file.name,
-            content: e.target.result,
-            category: category
-          });
-          filesReadCount++;
-          checkAllRead();
-        };
-        reader.onerror = () => {
-          alert(`خطا در خواندن فایل ${file.name}`);
-          filesReadCount++;
-          checkAllRead();
-        };
-        reader.readAsText(file);
-      } else {
-        alert(`فرمت فایل ${file.name} پشتیبانی نمی‌شود.`);
-        filesReadCount++;
-        checkAllRead();
-      }
-    });
-  }
-
-  selectFileBtn.onclick = () => fileInput.click();
-  addFileBtn.onclick = () => {
-    if (fileInput.files.length === 0) {
-      alert('لطفا ابتدا فایل(ها) را انتخاب کنید.');
-      return;
-    }
-    addFiles(fileInput.files);
-  };
-
-  const addArea = document.getElementById('addArea');
-  addArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    addArea.classList.add('dragover');
+function updateCatList() {
+  catList.innerHTML = '';
+  [...categories].sort().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    catList.appendChild(opt);
   });
-  addArea.addEventListener('dragleave', e => {
-    e.preventDefault();
-    addArea.classList.remove('dragover');
-  });
-  addArea.addEventListener('drop', e => {
-    e.preventDefault();
-    addArea.classList.remove('dragover');
-    addFiles(e.dataTransfer.files);
-  });
+}
 
-  // حذف فایل
-  function deleteFileById(id) {
-    files = files.filter(f => f.id !== id);
-    renderFiles();
-    doSearch();
-    updateInfoSummary();
-  }
-
-  // حذف دسته‌بندی
-  function deleteCategory(cat) {
-    if(!confirm(`آیا مطمئنید که می‌خواهید دسته‌بندی "${cat}" و تمام فایل‌های آن را حذف کنید؟`)) return;
-    files = files.filter(f => f.category !== cat);
-    categories.delete(cat);
-    renderFiles();
-    doSearch();
-    updateInfoSummary();
-  }
-
-  // ویرایش دسته‌بندی (inline)
-  function editCategoryName(spanElem, oldName) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = oldName;
-    input.className = 'inlineEdit';
-    spanElem.replaceWith(input);
-    input.focus();
-    input.select();
-
-    function finishEdit() {
-      let newName = input.value.trim();
-      if (!newName) {
-        alert('نام دسته‌بندی نمی‌تواند خالی باشد.');
-        input.focus();
-        return;
-      }
-      if (newName === oldName) {
-        input.replaceWith(spanElem);
-        return;
-      }
-      if (categories.has(newName)) {
-        alert('نام دسته‌بندی تکراری است.');
-        input.focus();
-        return;
-      }
-      categories.delete(oldName);
-      categories.add(newName);
-      files.forEach(f => {
-        if (f.category === oldName) f.category = newName;
-      });
-      renderFiles();
-      doSearch();
-      updateInfoSummary();
-    }
-
-    input.addEventListener('blur', finishEdit);
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') input.blur();
-      else if (e.key === 'Escape') input.replaceWith(spanElem);
-    });
-  }
-
-  // ویرایش نام فایل (inline)
-  function editFileName(spanElem, file) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = file.name;
-    input.className = 'inlineEdit';
-    spanElem.replaceWith(input);
-    input.focus();
-    input.select();
-
-    function finishEdit() {
-      let newName = input.value.trim();
-      if (!newName) {
-        alert('نام فایل نمی‌تواند خالی باشد.');
-        input.focus();
-        return;
-      }
-      if (newName === file.name) {
-        input.replaceWith(spanElem);
-        return;
-      }
-      if (files.some(f => f.category === file.category && f.name === newName && f.id !== file.id)) {
-        alert('نام فایل در این دسته‌بندی تکراری است.');
-        input.focus();
-        return;
-      }
-      file.name = newName;
-      renderFiles();
-      doSearch();
-    }
-
-    input.addEventListener('blur', finishEdit);
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') input.blur();
-      else if (e.key === 'Escape') input.replaceWith(spanElem);
-    });
-  }
-
-  // رندر فایل‌ها و دسته‌بندی‌ها
-  function renderFiles() {
-    filesList.innerHTML = '';
-    if (files.length === 0) {
-      filesList.textContent = 'فایلی اضافه نشده است.';
-      updateInfoSummary();
-      return;
-    }
-    categories = new Set(files.map(f => f.category));
-    updateCategoryDatalist();
-
-    const cats = [...categories].sort((a,b) => a.localeCompare(b));
-
-    cats.forEach(cat => {
-      const catFiles = files.filter(f => f.category === cat);
-      if (catFiles.length === 0) return;
-
-      const catDiv = document.createElement('section');
-      catDiv.className = 'category';
-
-      const catHeader = document.createElement('div');
-      catHeader.className = 'category-header';
-      catHeader.setAttribute('tabindex', '0');
-      catHeader.setAttribute('role', 'button');
-      catHeader.setAttribute('aria-expanded', 'true');
-      catHeader.setAttribute('aria-label', `دسته‌بندی ${cat} با ${catFiles.length} فایل`);
-
-      const arrowCat = document.createElement('span');
-      arrowCat.className = 'arrow';
-      arrowCat.textContent = '▼';
-      if (categoryOpenState[cat] === false) {
-        arrowCat.classList.add('collapsed');
-        catHeader.setAttribute('aria-expanded', 'false');
-      }
-
-      const catTitle = document.createElement('h2');
-      catTitle.classList.add('editable');
-      catTitle.textContent = cat;
-      catTitle.title = 'برای ویرایش نام دسته‌بندی کلیک کنید';
-      catTitle.style.userSelect = 'text';
-
-      const fileCountSpan = document.createElement('span');
-      fileCountSpan.className = 'file-count';
-      fileCountSpan.textContent = `(${catFiles.length} فایل)`;
-
-      const delCatBtn = document.createElement('button');
-      delCatBtn.className = 'deleteCategoryBtn';
-      delCatBtn.textContent = 'حذف دسته‌بندی';
-
-      delCatBtn.onclick = e => {
-        e.stopPropagation();
-        deleteCategory(cat);
-      };
-      catTitle.onclick = e => {
-        e.stopPropagation();
-        editCategoryName(catTitle, cat);
-      };
-
-      catHeader.appendChild(catTitle);
-      catHeader.appendChild(fileCountSpan);
-      catHeader.appendChild(arrowCat);
-      catHeader.appendChild(delCatBtn);
-
-      catDiv.appendChild(catHeader);
-
-      const catContent = document.createElement('div');
-      catContent.className = 'files-container';
-      catContent.style.display = categoryOpenState[cat] === false ? 'none' : 'block';
-
-      catHeader.onclick = () => {
-        const isVisible = catContent.style.display === 'block';
-        catContent.style.display = isVisible ? 'none' : 'block';
-        arrowCat.classList.toggle('collapsed', isVisible);
-        catHeader.setAttribute('aria-expanded', String(!isVisible));
-        categoryOpenState[cat] = !isVisible;
-      };
-      catHeader.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          catHeader.click();
-        }
-      });
-
-      catFiles.sort((a,b) => a.name.localeCompare(b.name)).forEach(file => {
-        const fileDiv = document.createElement('article');
-        fileDiv.className = 'fileItem';
-
-        const fileTitle = document.createElement('div');
-        fileTitle.className = 'fileTitle';
-        fileTitle.setAttribute('tabindex', '0');
-        fileTitle.setAttribute('role', 'button');
-        fileTitle.setAttribute('aria-expanded', 'false');
-        fileTitle.setAttribute('aria-label', `فایل ${file.name}`);
-
-        const arrowFile = document.createElement('span');
-        arrowFile.className = 'arrow';
-        arrowFile.textContent = '▶';
-
-        const fileNameSpan = document.createElement('span');
-        fileNameSpan.classList.add('fileName', 'editable');
-        fileNameSpan.textContent = file.name;
-        fileNameSpan.title = 'برای ویرایش نام فایل کلیک کنید';
-        fileNameSpan.style.userSelect = 'text';
-        fileNameSpan.style.flexGrow = '1';
-
-        fileNameSpan.onclick = e => {
-          e.stopPropagation();
-          editFileName(fileNameSpan, file);
-        };
-
-        const copyFileBtn = document.createElement('button');
-        copyFileBtn.className = 'copyFileBtn';
-        copyFileBtn.textContent = 'کپی محتوا';
-        copyFileBtn.title = `کپی محتوای فایل "${file.name}" به کلیپ‌بورد`;
-        copyFileBtn.onclick = e => {
-          e.stopPropagation();
-          navigator.clipboard.writeText(file.content)
-            .then(() => alert(`محتوای فایل "${file.name}" کپی شد.`))
-            .catch(() => alert('خطا در کپی کردن محتوا.'));
-        };
-
-        const delFileBtn = document.createElement('button');
-        delFileBtn.className = 'deleteFileBtn';
-        delFileBtn.textContent = 'حذف';
-        delFileBtn.title = `حذف فایل "${file.name}"`;
-
-        delFileBtn.onclick = e => {
-          e.stopPropagation();
-          if (confirm(`آیا مطمئنید که می‌خواهید فایل "${file.name}" را حذف کنید؟`)) {
-            deleteFileById(file.id);
-          }
-        };
-
-        fileTitle.appendChild(arrowFile);
-        fileTitle.appendChild(fileNameSpan);
-        fileTitle.appendChild(copyFileBtn);
-        fileTitle.appendChild(delFileBtn);
-
-        const fileContent = document.createElement('div');
-        fileContent.className = 'fileContent';
-        fileContent.style.display = 'none';
-
-        const textarea = document.createElement('textarea');
-        textarea.value = file.content;
-        textarea.setAttribute('aria-label', `محتوای فایل ${file.name}`);
-        textarea.oninput = e => {
-          const idx = files.findIndex(f => f.id === file.id);
-          if (idx > -1) {
-            files[idx].content = e.target.value;
-          }
-          doSearch();
-        };
-
-        fileContent.appendChild(textarea);
-
-        fileDiv.appendChild(fileTitle);
-        fileDiv.appendChild(fileContent);
-
-        fileTitle.onclick = () => {
-          const isOpen = fileContent.style.display === 'block';
-          fileContent.style.display = isOpen ? 'none' : 'block';
-          arrowFile.textContent = isOpen ? '▶' : '▼';
-          fileTitle.setAttribute('aria-expanded', String(!isOpen));
-        };
-        fileTitle.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            fileTitle.click();
-          }
-        });
-
-        catContent.appendChild(fileDiv);
-      });
-
-      catDiv.appendChild(catContent);
-      filesList.appendChild(catDiv);
-    });
-    updateInfoSummary();
-  }
-
-  function highlight(text, query) {
-    if (!query) return escapeHtml(text);
-    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escapedQuery, 'gi');
-    return escapeHtml(text).replace(regex, m => `<mark>${m}</mark>`);
-  }
-  function doSearch() {
-    const query = searchInput.value.trim();
-    searchResults.innerHTML = '';
-    if (!query) {
-      searchResults.textContent = 'عبارتی وارد نشده است.';
-      currentSearchResults = [];
-      return;
-    }
-    const results = [];
-    const lowerQuery = query.toLowerCase();
-    files.forEach(file => {
-      file.content.split('\n').forEach((line, idx) => {
-        if (line.toLowerCase().includes(lowerQuery)) {
-          results.push({
-            fileId: file.id,
-            fileName: file.name,
-            category: file.category,
-            lineNumber: idx + 1,
-            lineText: line
-          });
-        }
-      });
-    });
-    if (results.length === 0) {
-      searchResults.textContent = 'هیچ نتیجه‌ای یافت نشد.';
-      currentSearchResults = [];
-      return;
-    }
-    const counter = document.createElement('div');
-    counter.style.fontWeight = '700';
-    counter.style.marginBottom = '8px';
-    counter.textContent = `تعداد نتایج: ${results.length}`;
-    searchResults.appendChild(counter);
-
-    results.forEach(r => {
-      const div = document.createElement('div');
-      div.innerHTML = `<b>فایل:</b> ${escapeHtml(r.fileName)} | <b>دسته‌بندی:</b> ${escapeHtml(r.category)} | <b>خط:</b> ${r.lineNumber}<br>${highlight(r.lineText, query)}`;
-      searchResults.appendChild(div);
-    });
-    currentSearchResults = results;
-  }
-  searchInput.addEventListener('input', doSearch);
-  searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      searchInput.value = '';
-      doSearch();
-    }
-  });
-
-  function downloadFile(filename, content, mimeType) {
-    const blob = new Blob([content], {type: mimeType});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  exportHTMLBtn.onclick = () => {
-    let htmlContent = `
-      <!DOCTYPE html>
-      <html lang="fa" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <title>خروجی فایل‌ها</title>
-        <style>
-          body { font-family: Tahoma,sans-serif; background:#f5f5f5; padding:30px; color:#222; }
-          h2 {
-            color:#1565c0; 
-            border-bottom:2px solid #1565c0; 
-            padding-bottom:6px; 
-            margin: 0 0 10px 0; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            user-select:none;
-          }
-          h2 .arrow {
-            margin-left: 10px; 
-            transition: transform 0.3s ease;
-          }
-          h2.collapsed .arrow {
-            transform: rotate(-90deg);
-          }
-          .category {
-            margin-bottom: 30px; 
-            background: white; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-            padding: 10px 20px;
-          }
-          .files-container {
-            margin-top: 10px;
-          }
-          .fileItem {
-            margin-bottom: 15px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px 15px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-            position: relative;
-          }
-          .fileName {
-            font-weight: 700; 
-            color: #34495e;
-            margin-bottom: 6px;
-            display: inline-block;
-          }
-          pre {
-            background:#f9f9f9; 
-            padding:15px; 
-            border-radius:7px; 
-            box-shadow:0 2px 6px rgba(0,0,0,0.05); 
-            white-space:pre-wrap; 
-            word-break:break-word; 
-            font-family: monospace; 
-            margin: 0;
-            max-height: 250px;
-            overflow-y: auto;
-          }
-          button.copyFileBtn {
-            position: absolute;
-            top: 12px;
-            right: 15px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 13px;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.3s;
-          }
-          button.copyFileBtn:hover {
-            background-color: #2874a6;
-          }
-          #toggleAllBtn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            box-shadow: 0 3px 6px rgba(52,152,219,0.6);
-            margin-bottom: 25px;
-            transition: background-color 0.3s;
-          }
-          #toggleAllBtn:hover {
-            background-color: #2874a6;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>خروجی فایل‌های متنی</h1>
-        <button id="toggleAllBtn" aria-pressed="true" aria-label="باز یا بسته کردن همه دسته‌ها">باز/بسته کردن همه دسته‌ها</button>
-    `;
-
-    [...categories].sort((a,b) => a.localeCompare(b)).forEach(cat => {
-      const catFiles = files.filter(f => f.category === cat);
-      if(catFiles.length === 0) return;
-      htmlContent += `<section class="category">
-        <h2 tabindex="0" role="button" aria-expanded="true"><span class="arrow">▼</span>${escapeHtml(cat)}</h2>
-        <div class="files-container">
-      `;
-      catFiles.forEach(file => {
-        htmlContent += `
-          <div class="fileItem">
-            <span class="fileName">${escapeHtml(file.name)}</span>
-            <button class="copyFileBtn" type="button" aria-label="کپی محتوای فایل ${escapeHtml(file.name)}">کپی محتوا</button>
-            <pre>${escapeHtml(file.content)}</pre>
-          </div>
-        `;
-      });
-      htmlContent += `</div></section>`;
-    });
-
-    htmlContent += `
-      <script>
-        const toggleAllBtn = document.getElementById('toggleAllBtn');
-        const categories = document.querySelectorAll('.category');
-        let allOpen = true;
-
-        toggleAllBtn.addEventListener('click', () => {
-          allOpen = !allOpen;
-          categories.forEach(cat => {
-            const header = cat.querySelector('h2');
-            const arrow = header.querySelector('.arrow');
-            const content = cat.querySelector('.files-container');
-            if (allOpen) {
-              content.style.display = 'block';
-              header.setAttribute('aria-expanded', 'true');
-              arrow.textContent = '▼';
-            } else {
-              content.style.display = 'none';
-              header.setAttribute('aria-expanded', 'false');
-              arrow.textContent = '▶';
-            }
-          });
-          toggleAllBtn.setAttribute('aria-pressed', allOpen.toString());
-        });
-
-        categories.forEach(cat => {
-          const header = cat.querySelector('h2');
-          const arrow = header.querySelector('.arrow');
-          const content = cat.querySelector('.files-container');
-          header.addEventListener('click', () => {
-            const isVisible = content.style.display !== 'none';
-            if (isVisible) {
-              content.style.display = 'none';
-              header.setAttribute('aria-expanded', 'false');
-              arrow.textContent = '▶';
-            } else {
-              content.style.display = 'block';
-              header.setAttribute('aria-expanded', 'true');
-              arrow.textContent = '▼';
-            }
-          });
-          header.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              header.click();
-            }
-          });
-
-          // دکمه‌های کپی فایل
-          const copyBtns = cat.querySelectorAll('button.copyFileBtn');
-          copyBtns.forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const pre = btn.nextElementSibling;
-              if (!pre) return;
-              const textToCopy = pre.textContent;
-              navigator.clipboard.writeText(textToCopy)
-                .then(() => alert('محتوای فایل کپی شد.'))
-                .catch(() => alert('خطا در کپی کردن محتوا.'));
-            });
-          });
-        });
-      <\/script>
-      </body>
-      </html>
-    `;
-
-    downloadFile('output.html', htmlContent, 'text/html');
-  };
-
-  saveFilesBtn.onclick = () => {
-    if (files.length === 0) {
-      alert('فایلی برای ذخیره وجود ندارد.');
-      return;
-    }
-    files.forEach(file => {
-      downloadFile(file.name, file.content, 'text/plain');
-    });
-  };
-
-  saveSearchResultsBtn.onclick = () => {
-    if (currentSearchResults.length === 0) {
-      alert('نتیجه جستجویی برای ذخیره وجود ندارد.');
-      return;
-    }
-    let text = '';
-    currentSearchResults.forEach(r => {
-      text += `فایل: ${r.fileName} | دسته‌بندی: ${r.category} | خط: ${r.lineNumber}\n${r.lineText}\n\n`;
-    });
-    downloadFile('search_results.txt', text, 'text/plain');
-  };
-
-  saveFilesWithSearchResultsBtn.onclick = () => {
-    if (currentSearchResults.length === 0) {
-      alert('نتیجه جستجویی وجود ندارد.');
-      return;
-    }
-    const fileIds = new Set(currentSearchResults.map(r => r.fileId));
-    if (fileIds.size === 0) {
-      alert('هیچ فایلی در نتایج یافت نشد.');
-      return;
-    }
-    fileIds.forEach(id => {
-      const file = files.find(f => f.id === id);
-      if (file) {
-        downloadFile(file.name, file.content, 'text/plain');
-      }
-    });
-  };
-
-  exportZIPBtn.onclick = () => {
-    if (files.length === 0) {
-      alert('فایلی برای خروجی ZIP وجود ندارد.');
-      return;
-    }
-    const zip = new JSZip();
-    files.forEach(file => {
-      const folder = zip.folder(file.category || 'دسته‌بندی نشده');
-      folder.file(file.name, file.content);
-    });
-    zip.generateAsync({type: "blob"}).then(content => {
-      const url = URL.createObjectURL(content);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'files.zip';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    });
-  };
-
-  toggleAllCategoriesBtn.onclick = () => {
-    const allOpen = [...categories].every(cat => categoryOpenState[cat] !== false);
-    [...categories].forEach(cat => {
-      categoryOpenState[cat] = allOpen ? false : true;
-    });
-    renderFiles();
-  };
-
-  document.addEventListener('keydown', e => {
-    if (e.target === searchInput) return;
-    if (e.key.toLowerCase() === 'a') {
-      e.preventDefault();
-      toggleAllCategoriesBtn.click();
-    }
-  });
-
-  // export JSON
-  exportJSONBtn.onclick = () => {
-    if (files.length === 0) {
-      alert('هیچ فایلی برای خروجی JSON وجود ندارد.');
-      return;
-    }
+function saveData() {
+  try {
     const data = {
-      files: files,
-      categoryOpenState: categoryOpenState
+      files: files.map(f => ({id:f.id, name:f.name, content:f.content, category:f.category})),
+      openStates, idCounter
     };
-    const jsonStr = JSON.stringify(data, null, 2);
-    downloadFile('files_data.json', jsonStr, 'application/json');
-  };
+    localStorage.setItem('t2h', JSON.stringify(data));
+  } catch(e) {}
+}
 
-  // import JSON
-  importJSONInput.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('حجم فایل JSON بیشتر از 2 مگابایت است.');
+function loadData() {
+  try {
+    const raw = localStorage.getItem('t2h');
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.files && Array.isArray(data.files)) {
+      files = data.files;
+      idCounter = data.idCounter || Math.max(...files.map(f => f.id || 0), 0) + 1;
+      openStates = data.openStates || {};
+      categories = new Set(files.map(f => f.category));
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ===== عملیات اصلی =====
+
+function render() {
+  filesList.innerHTML = '';
+  if (files.length === 0) {
+    filesList.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';
+    updateInfo();
+    return;
+  }
+
+  categories = new Set(files.map(f => f.category));
+  updateCatList();
+
+  [...categories].sort().forEach(cat => {
+    const catFiles = files.filter(f => f.category === cat);
+    if (catFiles.length === 0) return;
+
+    const box = document.createElement('div');
+    box.className = 'category-box';
+
+    // هدر دسته
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('role', 'button');
+    const isOpen = openStates[cat] !== false;
+    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow' + (isOpen ? '' : ' collapsed');
+    arrow.textContent = '▼';
+
+    const title = document.createElement('h2');
+    title.textContent = cat;
+    title.title = 'کلیک برای ویرایش نام';
+    title.onclick = e => { e.stopPropagation(); editCatName(title, cat); };
+
+    const count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = `${catFiles.length} فایل`;
+
+    const actions = document.createElement('div');
+    actions.className = 'cat-actions';
+
+    const printBtn = document.createElement('button');
+    printBtn.textContent = '🖨️ پرینت';
+    printBtn.onclick = e => { e.stopPropagation(); printCategory(cat); };
+
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = '📋 کپی';
+    copyBtn.onclick = e => { e.stopPropagation(); copyCategory(cat); };
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'danger';
+    delBtn.textContent = '🗑️ حذف';
+    delBtn.onclick = e => { e.stopPropagation(); deleteCategory(cat); };
+
+    actions.appendChild(printBtn);
+    actions.appendChild(copyBtn);
+    actions.appendChild(delBtn);
+
+    header.appendChild(arrow);
+    header.appendChild(title);
+    header.appendChild(count);
+    header.appendChild(actions);
+
+    // محتوای دسته
+    const container = document.createElement('div');
+    container.className = 'files-container';
+    container.style.display = isOpen ? 'block' : 'none';
+
+    header.onclick = () => {
+      const visible = container.style.display === 'block';
+      container.style.display = visible ? 'none' : 'block';
+      arrow.classList.toggle('collapsed', visible);
+      header.setAttribute('aria-expanded', visible ? 'false' : 'true');
+      openStates[cat] = !visible;
+      saveData();
+    };
+    header.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); header.click(); }
+    });
+
+    box.appendChild(header);
+    box.appendChild(container);
+
+    // فایل‌ها
+    catFiles.sort((a,b) => a.name.localeCompare(b.name)).forEach(file => {
+      const item = document.createElement('div');
+      item.className = 'file-item';
+
+      const fheader = document.createElement('div');
+      fheader.className = 'file-header';
+      fheader.setAttribute('tabindex', '0');
+      fheader.setAttribute('role', 'button');
+      fheader.setAttribute('aria-expanded', 'false');
+
+      const farrow = document.createElement('span');
+      farrow.className = 'arrow';
+      farrow.textContent = '▶';
+
+      const fname = document.createElement('span');
+      fname.className = 'fname';
+      fname.textContent = file.name;
+      fname.title = 'کلیک برای ویرایش';
+      fname.onclick = e => { e.stopPropagation(); editFileName(fname, file); };
+
+      const factions = document.createElement('div');
+      factions.className = 'file-actions';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = '📋 کپی';
+      copyBtn.onclick = e => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(file.content)
+          .then(() => toast('✅ کپی شد', 'success'))
+          .catch(() => toast('❌ خطا', 'error'));
+      };
+
+      const printBtn = document.createElement('button');
+      printBtn.className = 'success';
+      printBtn.textContent = '🖨️ پرینت';
+      printBtn.onclick = e => { e.stopPropagation(); printFile(file); };
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'danger';
+      delBtn.textContent = '🗑️';
+      delBtn.onclick = e => { e.stopPropagation(); deleteFile(file.id); };
+
+      factions.appendChild(copyBtn);
+      factions.appendChild(printBtn);
+      factions.appendChild(delBtn);
+
+      fheader.appendChild(farrow);
+      fheader.appendChild(fname);
+      fheader.appendChild(factions);
+
+      // محتوای فایل
+      const fcontent = document.createElement('div');
+      fcontent.className = 'file-content';
+      fcontent.style.display = 'none';
+
+      const ta = document.createElement('textarea');
+      ta.value = file.content;
+      ta.oninput = e => {
+        const idx = files.findIndex(f => f.id === file.id);
+        if (idx > -1) {
+          files[idx].content = e.target.value;
+        }
+        searchDo();
+        saveData();
+      };
+
+      const cactions = document.createElement('div');
+      cactions.className = 'content-actions';
+
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = '💾 ذخیره';
+      saveBtn.onclick = e => { e.stopPropagation(); saveData(); toast('✅ ذخیره شد', 'success'); };
+
+      const dlBtn = document.createElement('button');
+      dlBtn.textContent = '⬇️ دانلود';
+      dlBtn.onclick = e => {
+        e.stopPropagation();
+        download(file.name, file.content, 'text/plain');
+      };
+
+      cactions.appendChild(saveBtn);
+      cactions.appendChild(dlBtn);
+
+      fcontent.appendChild(ta);
+      fcontent.appendChild(cactions);
+
+      item.appendChild(fheader);
+      item.appendChild(fcontent);
+
+      fheader.onclick = () => {
+        const visible = fcontent.style.display === 'block';
+        fcontent.style.display = visible ? 'none' : 'block';
+        farrow.classList.toggle('open', !visible);
+        farrow.textContent = visible ? '▶' : '▼';
+        fheader.setAttribute('aria-expanded', visible ? 'false' : 'true');
+      };
+      fheader.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fheader.click(); }
+      });
+
+      container.appendChild(item);
+    });
+
+    filesList.appendChild(box);
+  });
+  updateInfo();
+}
+
+// ===== ویرایش نام دسته =====
+function editCatName(el, old) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = old;
+  input.className = 'inline-edit';
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+
+  function done() {
+    let val = input.value.trim();
+    if (!val) { toast('نام نمی‌تواند خالی باشد', 'warning'); input.focus(); return; }
+    if (val === old) { input.replaceWith(el); return; }
+    if (categories.has(val)) { toast('نام تکراری است', 'warning'); input.focus(); return; }
+    categories.delete(old);
+    categories.add(val);
+    files.forEach(f => { if (f.category === old) f.category = val; });
+    render(); searchDo(); updateInfo(); saveData();
+    toast('✅ نام تغییر کرد', 'success');
+  }
+
+  input.addEventListener('blur', done);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    else if (e.key === 'Escape') { input.replaceWith(el); }
+  });
+}
+
+// ===== ویرایش نام فایل =====
+function editFileName(el, file) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = file.name;
+  input.className = 'inline-edit';
+  input.style.maxWidth = '200px';
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+
+  function done() {
+    let val = input.value.trim();
+    if (!val) { toast('نام نمی‌تواند خالی باشد', 'warning'); input.focus(); return; }
+    if (val === file.name) { input.replaceWith(el); return; }
+    if (files.some(f => f.category === file.category && f.name === val && f.id !== file.id)) {
+      toast('نام تکراری است', 'warning'); input.focus(); return;
+    }
+    file.name = val;
+    render(); searchDo(); saveData();
+    toast('✅ نام تغییر کرد', 'success');
+  }
+
+  input.addEventListener('blur', done);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    else if (e.key === 'Escape') { input.replaceWith(el); }
+  });
+}
+
+// ===== حذف فایل =====
+function deleteFile(id) {
+  const file = files.find(f => f.id === id);
+  if (!file) return;
+  undoData = { action: 'file', file: {...file}, cat: file.category };
+  $('undoBtn').disabled = false;
+  files = files.filter(f => f.id !== id);
+  render(); searchDo(); saveData();
+  toast(`🗑️ "${file.name}" حذف شد`, 'warning');
+}
+
+// ===== حذف دسته =====
+function deleteCategory(cat) {
+  if (!confirm(`آیا دسته "${cat}" و ${files.filter(f=>f.category===cat).length} فایل آن حذف شود؟`)) return;
+  const deleted = files.filter(f => f.category === cat).map(f => ({...f}));
+  undoData = { action: 'cat', cat, files: deleted };
+  $('undoBtn').disabled = false;
+  files = files.filter(f => f.category !== cat);
+  categories.delete(cat);
+  render(); searchDo(); saveData();
+  toast(`🗑️ دسته "${cat}" حذف شد`, 'warning');
+}
+
+// ===== بازگردانی =====
+function undo() {
+  if (!undoData) return;
+  if (undoData.action === 'file') {
+    files.push({ id: idCounter++, ...undoData.file, category: undoData.cat });
+    categories.add(undoData.cat);
+    toast('↩️ فایل بازگردانی شد', 'success');
+  } else if (undoData.action === 'cat') {
+    undoData.files.forEach(f => {
+      files.push({ id: idCounter++, ...f, category: undoData.cat });
+    });
+    categories.add(undoData.cat);
+    toast(`↩️ دسته "${undoData.cat}" بازگردانی شد`, 'success');
+  }
+  undoData = null;
+  $('undoBtn').disabled = true;
+  render(); searchDo(); saveData();
+}
+
+// ===== پاک کردن همه =====
+function clearAll() {
+  if (files.length === 0) { toast('چیزی برای پاک کردن نیست', 'warning'); return; }
+  if (!confirm('همه فایل‌ها پاک شوند؟ می‌توانید بازگردانی کنید.')) return;
+  undoData = { action: 'cat', cat: 'همه', files: files.map(f => ({...f})) };
+  $('undoBtn').disabled = false;
+  files = []; categories.clear();
+  render(); searchDo(); saveData();
+  toast('🗑️ همه پاک شدند', 'warning');
+}
+
+// ===== پرینت و کپی =====
+function printFile(file) {
+  const w = window.open('', '_blank', 'width=800,height=600');
+  w.document.write(`
+    <!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="UTF-8">
+    <title>پرینت - ${escapeHtml(file.name)}</title>
+    <style>
+      body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl}
+      h1{color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:10px}
+      .meta{color:#666;font-size:14px;margin-bottom:20px}
+      pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word;border:1px solid #ddd}
+    </style></head><body>
+    <h1>📄 ${escapeHtml(file.name)}</h1>
+    <div class="meta">📁 ${escapeHtml(file.category)} | 📅 ${new Date().toLocaleDateString('fa-IR')} | 📊 ${(file.content.length/1024).toFixed(1)} KB</div>
+    <pre>${escapeHtml(file.content)}</pre>
+    <script>window.onload=function(){window.print();window.close()}<\\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+function printCategory(cat) {
+  const catFiles = files.filter(f => f.category === cat);
+  if (catFiles.length === 0) { toast('فایلی نیست', 'warning'); return; }
+  const w = window.open('', '_blank', 'width=900,height=700');
+  let html = `<!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="UTF-8">
+    <title>پرینت - ${escapeHtml(cat)}</title>
+    <style>
+      body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5}
+      h1{color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:10px}
+      .item{background:white;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 5px rgba(0,0,0,0.1);break-inside:avoid}
+      .fname{font-weight:700;color:#2c3e50;border-bottom:1px solid #ddd;padding-bottom:5px;margin-bottom:10px}
+      pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word;border:1px solid #e0e0e0;margin:0}
+    </style></head><body>
+    <h1>📁 ${escapeHtml(cat)} - ${catFiles.length} فایل</h1>
+    <p style="color:#888">📅 ${new Date().toLocaleDateString('fa-IR')}</p>`;
+  catFiles.forEach(f => {
+    html += `<div class="item"><div class="fname">📄 ${escapeHtml(f.name)}</div><pre>${escapeHtml(f.content)}</pre></div>`;
+  });
+  html += `<script>window.onload=function(){window.print();window.close()}<\\/script></body></html>`;
+  w.document.write(html);
+  w.document.close();
+}
+
+function copyCategory(cat) {
+  const catFiles = files.filter(f => f.category === cat);
+  if (catFiles.length === 0) { toast('فایلی نیست', 'warning'); return; }
+  let text = '';
+  catFiles.forEach(f => {
+    text += `===== ${f.name} =====\n${f.content}\n\n`;
+  });
+  navigator.clipboard.writeText(text)
+    .then(() => toast(`✅ محتوای ${catFiles.length} فایل کپی شد`, 'success'))
+    .catch(() => toast('❌ خطا در کپی', 'error'));
+}
+
+// ===== دانلود =====
+function download(name, content, mime) {
+  const blob = new Blob([content], {type: mime + ';charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+// ===== جستجو =====
+let searchTimer = null;
+
+function searchDo() {
+  const q = searchInput.value.trim();
+  searchResultsDiv.innerHTML = '';
+  if (!q) {
+    searchResultsDiv.innerHTML = '<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';
+    searchResults = [];
+    return;
+  }
+
+  const results = [];
+  const lower = q.toLowerCase();
+  files.forEach(f => {
+    f.content.split('\n').forEach((line, i) => {
+      if (line.toLowerCase().includes(lower)) {
+        results.push({ id: f.id, name: f.name, cat: f.category, line: i+1, text: line });
+      }
+    });
+  });
+
+  if (results.length === 0) {
+    searchResultsDiv.innerHTML = '<p style="color:#888">🔍 نتیجه‌ای یافت نشد.</p>';
+    searchResults = [];
+    return;
+  }
+
+  const count = document.createElement('div');
+  count.style.cssText = 'font-weight:700;margin-bottom:8px;color:var(--primary-light)';
+  count.textContent = `✅ ${results.length} نتیجه`;
+  searchResultsDiv.appendChild(count);
+
+  const maxShow = 50;
+  results.slice(0, maxShow).forEach(r => {
+    const div = document.createElement('div');
+    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedQ, 'gi');
+    const highlighted = escapeHtml(r.text).replace(regex, m => `<mark>${m}</mark>`);
+    div.innerHTML = `<b>📄</b> ${escapeHtml(r.name)} | <b>📁</b> ${escapeHtml(r.cat)} | <b>🔢</b> خط ${r.line}<br>${highlighted}`;
+    searchResultsDiv.appendChild(div);
+  });
+
+  if (results.length > maxShow) {
+    const more = document.createElement('div');
+    more.style.cssText = 'color:#888;font-style:italic';
+    more.textContent = `... و ${results.length - maxShow} نتیجه دیگر`;
+    searchResultsDiv.appendChild(more);
+  }
+
+  searchResults = results;
+}
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(searchDo, 200);
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; searchDo(); }
+});
+
+// ===== افزودن فایل =====
+function addFiles(fileList) {
+  if (files.length + fileList.length > MAX_FILES) {
+    toast(`❌ حداکثر ${MAX_FILES} فایل`, 'error');
+    return;
+  }
+  let cat = catInput.value.trim();
+  if (!cat) cat = 'دسته‌بندی نشده';
+  categories.add(cat);
+
+  let done = 0, total = fileList.length, errors = 0;
+
+  function check() {
+    if (done === total) {
+      updateCatList();
+      render();
+      catInput.value = '';
+      fileInput.value = '';
+      searchDo();
+      saveData();
+      if (total - errors > 0) toast(`✅ ${total - errors} فایل اضافه شد`, 'success');
+    }
+  }
+
+  Array.from(fileList).forEach(file => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!ACCEPTED.includes(ext)) {
+      toast(`❌ فرمت ${file.name} مجاز نیست`, 'error');
+      done++; errors++; check();
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      toast(`❌ ${file.name} حجیم است`, 'error');
+      done++; errors++; check();
       return;
     }
     const reader = new FileReader();
     reader.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        if (!data.files || !Array.isArray(data.files)) {
-          alert('فایل JSON معتبر نیست.');
-          return;
-        }
-        if (data.files.length > MAX_FILES) {
-          alert(`فایل JSON بیش از ${MAX_FILES} فایل دارد.`);
-          return;
-        }
-        files = data.files.map(f => ({
-          id: f.id || fileIdCounter++,
-          name: f.name,
-          content: f.content,
-          category: f.category || 'دسته‌بندی نشده'
-        }));
-        categoryOpenState = data.categoryOpenState || {};
-        categories = new Set(files.map(f => f.category));
-        fileIdCounter = Math.max(...files.map(f=>f.id), 0) + 1;
-        renderFiles();
-        doSearch();
-        updateInfoSummary();
-        alert('وارد کردن فایل JSON با موفقیت انجام شد.');
-      } catch {
-        alert('خطا در خواندن فایل JSON.');
-      }
+      files.push({ id: idCounter++, name: file.name, content: e.target.result, category: cat });
+      done++; check();
     };
+    reader.onerror = () => { done++; errors++; check(); };
     reader.readAsText(file);
-    e.target.value = '';
+  });
+}
+
+// ===== رویدادها =====
+
+// درگ و دراپ
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+dropArea.addEventListener('dragleave', e => { e.preventDefault(); dropArea.classList.remove('dragover'); });
+dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+
+$('selectFilesBtn').onclick = () => fileInput.click();
+$('addFilesBtn').onclick = () => {
+  if (fileInput.files.length === 0) { toast('فایلی انتخاب نشده', 'warning'); return; }
+  addFiles(fileInput.files);
+};
+
+// افزودن دستی
+$('manualAddBtn').onclick = () => {
+  const name = $('manualName').value.trim();
+  let cat = $('manualCat').value.trim();
+  const content = $('manualContent').value;
+
+  if (!name) { toast('نام فایل را وارد کنید', 'warning'); $('manualName').focus(); return; }
+  const ext = name.split('.').pop().toLowerCase();
+  if (!ACCEPTED.includes(ext)) { toast('فرمت مجاز نیست', 'warning'); $('manualName').focus(); return; }
+  if (!cat) cat = 'دسته‌بندی نشده';
+  if (files.some(f => f.category === cat && f.name === name)) { toast('نام تکراری است', 'warning'); return; }
+  if (content.length > MAX_SIZE) { toast('محتوا حجیم است', 'warning'); return; }
+  if (files.length >= MAX_FILES) { toast('ظرفیت پر است', 'error'); return; }
+
+  files.push({ id: idCounter++, name, content, category: cat });
+  categories.add(cat);
+  updateCatList();
+  render();
+  searchDo();
+  saveData();
+  $('manualName').value = '';
+  $('manualCat').value = '';
+  $('manualContent').value = '';
+  toast(`✅ "${name}" اضافه شد`, 'success');
+};
+
+// دکمه‌های هدر
+$('toggleAllBtn').onclick = () => {
+  const allOpen = [...categories].every(c => openStates[c] !== false);
+  categories.forEach(c => { openStates[c] = allOpen ? false : true; });
+  render(); saveData();
+  toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
+};
+
+// ===== خروجی HTML با قابلیت باز و بسته شدن =====
+$('exportHtmlBtn').onclick = () => {
+  if (files.length === 0) { toast('❌ فایلی برای خروجی وجود ندارد.', 'error'); return; }
+
+  let html = `<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>خروجی Text2Html</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Tahoma, sans-serif; background: #f5f5f5; padding: 30px; direction: rtl; }
+    h1 { color: #1565c0; border-bottom: 3px solid #1565c0; padding-bottom: 10px; margin-bottom: 20px; }
+    .category { margin-bottom: 30px; background: white; border-radius: 12px; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .cat-header { 
+      display: flex; align-items: center; gap: 10px; margin: 0 0 15px; flex-wrap: wrap; cursor: pointer; user-select: none;
+    }
+    .cat-header .arrow { margin-left: 8px; transition: 0.3s; }
+    .cat-header .arrow.collapsed { transform: rotate(-90deg); }
+    .cat-header h2 { color: #1565c0; flex: 1; font-size: 18px; }
+    .cat-header .cat-buttons { display: flex; gap: 5px; margin-right: auto; }
+    .cat-header button { padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; background: #3498db; color: white; transition: 0.2s; }
+    .cat-header button:hover { background: #2980b9; }
+    .cat-header button.print-all { background: #27ae60; }
+    .cat-header button.copy-all { background: #f39c12; color: #333; }
+    .files-container { margin-top: 10px; }
+    .file-item { margin-bottom: 15px; background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+    .file-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .file-name { font-weight: 700; color: #34495e; }
+    .file-buttons { display: flex; gap: 5px; }
+    .file-buttons button { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; background: #3498db; color: white; transition: 0.2s; }
+    .file-buttons button:hover { background: #2980b9; }
+    .file-buttons button.print-file { background: #27ae60; }
+    .file-buttons button.copy-file { background: #f39c12; color: #333; }
+    pre { background: #f9f9f9; padding: 15px; border-radius: 7px; white-space: pre-wrap; word-break: break-word; font-family: monospace; font-size: 13px; border: 1px solid #eee; max-height: 300px; overflow-y: auto; margin: 0; }
+    .meta { color: #888; font-size: 13px; margin-bottom: 5px; }
+    @media print { body { padding: 15px; } .file-buttons, .cat-buttons { display: none; } }
+  </style>
+</head>
+<body>
+<h1>📄 خروجی فایل‌های متنی</h1>
+<p class="meta">📅 ${new Date().toLocaleDateString('fa-IR')} | تعداد فایل‌ها: ${files.length}</p>
+
+<script>
+  // توابع کپی و پرینت
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => alert('✅ متن کپی شد!')).catch(() => alert('❌ خطا در کپی'));
+  }
+  function printPre(preElement) {
+    const content = preElement.textContent;
+    const fileName = preElement.getAttribute('data-filename') || 'فایل';
+    const win = window.open('', '_blank', 'width=800,height=600');
+    win.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>پرینت - ' + fileName + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 ' + fileName + '</h1><pre>' + content + '</pre><script>window.onload=function(){window.print();window.close()}<\\/script></body></html>');
+    win.document.close();
+  }
+  function printCategory(catName) {
+    const items = document.querySelectorAll('.category[data-cat="' + catName + '"] .file-item');
+    if (items.length === 0) return;
+    const win = window.open('', '_blank', 'width=900,height=700');
+    let html = '<html dir="rtl"><head><meta charset="UTF-8"><title>پرینت - ' + catName + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5}.item{background:white;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 5px rgba(0,0,0,0.1)}.fname{font-weight:700;color:#2c3e50;border-bottom:1px solid #ddd;padding-bottom:5px;margin-bottom:10px}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word;border:1px solid #e0e0e0}</style></head><body><h1>📁 ' + catName + '</h1>';
+    items.forEach(item => {
+      const fname = item.querySelector('.file-name').textContent;
+      const content = item.querySelector('pre').textContent;
+      html += '<div class="item"><div class="fname">📄 ' + fname + '</div><pre>' + content + '</pre></div>';
+    });
+    html += '<script>window.onload=function(){window.print();window.close()}<\\/script></body></html>';
+    win.document.write(html);
+    win.document.close();
+  }
+  function copyCategory(catName) {
+    const items = document.querySelectorAll('.category[data-cat="' + catName + '"] .file-item');
+    let text = '';
+    items.forEach(item => {
+      const fname = item.querySelector('.file-name').textContent;
+      const content = item.querySelector('pre').textContent;
+      text += '===== ' + fname + ' =====\\n' + content + '\\n\\n';
+    });
+    copyText(text);
+  }
+
+  // باز و بسته کردن دسته‌ها
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.cat-header').forEach(header => {
+      header.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') return;
+        const container = this.nextElementSibling;
+        const arrow = this.querySelector('.arrow');
+        if (container && arrow) {
+          if (container.style.display === 'none') {
+            container.style.display = 'block';
+            arrow.classList.remove('collapsed');
+          } else {
+            container.style.display = 'none';
+            arrow.classList.add('collapsed');
+          }
+        }
+      });
+    });
+  });
+<\/script>`;
+
+  // اضافه کردن دسته‌بندی‌ها
+  [...categories].sort().forEach(cat => {
+    const catFiles = files.filter(f => f.category === cat);
+    if (catFiles.length === 0) return;
+
+    html += `
+<div class="category" data-cat="${escapeHtml(cat)}">
+  <div class="cat-header">
+    <span class="arrow">▼</span>
+    <h2>📁 ${escapeHtml(cat)} (${catFiles.length})</h2>
+    <span class="cat-buttons">
+      <button class="print-all" onclick="printCategory('${escapeHtml(cat)}')">🖨️ پرینت همه</button>
+      <button class="copy-all" onclick="copyCategory('${escapeHtml(cat)}')">📋 کپی همه</button>
+    </span>
+  </div>
+  <div class="files-container">`;
+
+    catFiles.forEach(file => {
+      html += `
+    <div class="file-item">
+      <div class="file-header">
+        <span class="file-name">📄 ${escapeHtml(file.name)}</span>
+        <span class="file-buttons">
+          <button class="print-file" onclick="printPre(this.parentElement.parentElement.nextElementSibling)">🖨️ پرینت</button>
+          <button class="copy-file" onclick="copyText(this.parentElement.parentElement.nextElementSibling.textContent)">📋 کپی</button>
+        </span>
+      </div>
+      <pre data-filename="${escapeHtml(file.name)}">${escapeHtml(file.content)}</pre>
+    </div>`;
+    });
+
+    html += `
+  </div>
+</div>`;
   });
 
-  // افزودن فایل به صورت دستی
-  manualAddBtn.onclick = () => {
-    const name = manualFileNameInput.value.trim();
-    let category = manualCategorySelect.value.trim();
-    const content = manualFileContentTextarea.value;
+  html += `</body></html>`;
 
-    if (!name) {
-      alert('لطفا نام فایل را وارد کنید.');
-      manualFileNameInput.focus();
-      return;
-    }
-    const ext = name.split('.').pop().toLowerCase();
-    if (!['txt', 'bat', 'css', 'js'].includes(ext)) {
-      alert('پسوند فایل باید یکی از موارد txt، bat، css، js باشد.');
-      manualFileNameInput.focus();
-      return;
-    }
+  download('output.html', html, 'text/html');
+  toast('✅ خروجی HTML با دکمه‌های پرینت، کپی و قابلیت باز/بسته شدن ساخته شد.', 'success');
+};
 
-    if (!category) category = 'دسته‌بندی نشده';
+$('exportJsonBtn').onclick = () => {
+  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
+  const data = { exportDate: new Date().toISOString(), files: files.map(f => ({id:f.id, name:f.name, content:f.content, category:f.category})), openStates };
+  download('text2html_backup.json', JSON.stringify(data, null, 2), 'application/json');
+  toast('✅ JSON ساخته شد', 'success');
+};
 
-    if (files.some(f => f.category === category && f.name === name)) {
-      alert('نام فایل در این دسته‌بندی تکراری است.');
-      manualFileNameInput.focus();
-      return;
-    }
+$('importJsonInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { toast('حجم JSON زیاد است', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const imported = data.files || data;
+      if (!Array.isArray(imported)) { toast('JSON معتبر نیست', 'error'); return; }
+      if (imported.length > MAX_FILES) { toast('تعداد فایل‌ها زیاد است', 'error'); return; }
 
-    if (content.length > MAX_FILE_SIZE) {
-      alert('حجم محتوای فایل بیش از 3 مگابایت است.');
-      manualFileContentTextarea.focus();
-      return;
-    }
+      undoData = { action: 'cat', cat: 'ورودی JSON', files: files.map(f => ({...f})) };
+      $('undoBtn').disabled = false;
 
-    if (files.length >= MAX_FILES) {
-      alert(`حداکثر تعداد فایل‌ها ${MAX_FILES} است.`);
-      return;
-    }
-
-    files.push({
-      id: fileIdCounter++,
-      name: name,
-      content: content,
-      category: category
-    });
-    categories.add(category);
-    updateCategoryDatalist();
-    renderFiles();
-    doSearch();
-    updateInfoSummary();
-
-    manualFileNameInput.value = '';
-    manualCategorySelect.value = '';
-    manualFileContentTextarea.value = '';
+      files = imported.map((f, i) => ({
+        id: f.id || idCounter++,
+        name: f.name || `file_${i+1}.txt`,
+        content: f.content || '',
+        category: f.category || 'دسته‌بندی نشده'
+      }));
+      openStates = data.openStates || {};
+      categories = new Set(files.map(f => f.category));
+      idCounter = Math.max(...files.map(f => f.id || 0), 0) + 1;
+      render(); searchDo(); saveData();
+      toast(`✅ ${files.length} فایل وارد شد`, 'success');
+    } catch(err) { toast('❌ خطا در خواندن JSON', 'error'); }
   };
+  reader.readAsText(file);
+  e.target.value = '';
+};
 
-  // مودال‌ها
-  helpBtn.addEventListener('click', () => {
-    helpModal.classList.add('active');
-  });
+$('exportZipBtn').onclick = () => {
+  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
+  if (typeof JSZip === 'undefined') { toast('ZIP library not loaded', 'error'); return; }
+  const zip = new JSZip();
+  files.forEach(f => zip.folder(f.category || 'متفرقه').file(f.name, f.content));
+  zip.generateAsync({type:'blob'}).then(content => {
+    download('files.zip', content, 'application/zip');
+    toast('✅ ZIP ساخته شد', 'success');
+  }).catch(() => toast('❌ خطا', 'error'));
+};
 
-  authorInfoBtn.addEventListener('click', () => {
-    authorModal.classList.add('active');
-  });
+$('saveFilesBtn').onclick = () => {
+  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
+  files.forEach(f => download(f.name, f.content, 'text/plain'));
+  toast(`✅ ${files.length} فایل ذخیره شد`, 'success');
+};
 
-  closeModalButtons.forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.target.closest('.modalOverlay').classList.remove('active');
-    });
-  });
+$('clearAllBtn').onclick = clearAll;
+$('undoBtn').onclick = undo;
 
-  [helpModal, authorModal].forEach(modal => {
-    modal.addEventListener('click', e => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-      }
-    });
-  });
+// دارک مود
+let dark = false;
+$('darkToggle').onclick = () => {
+  dark = !dark;
+  document.body.style.background = dark ? '#1a1a2e' : '#f0f4f8';
+  document.body.style.color = dark ? '#e0e0e0' : '#333';
+  $('darkToggle').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('t2h_dark', dark);
+};
+if (localStorage.getItem('t2h_dark') === 'true') $('darkToggle').click();
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      if (helpModal.classList.contains('active')) {
-        helpModal.classList.remove('active');
-      }
-      if (authorModal.classList.contains('active')) {
-        authorModal.classList.remove('active');
-      }
-    }
-  });
+// مودال‌ها
+$('helpBtn').onclick = () => $('helpModal').classList.add('active');
+$('closeHelp').onclick = () => $('helpModal').classList.remove('active');
+$('helpModal').onclick = e => { if (e.target === $('helpModal')) $('helpModal').classList.remove('active'); };
 
-  // تغییر فونت
-  const fontSelect = document.getElementById('fontSelect');
-  fontSelect.addEventListener('change', () => {
-    document.body.style.fontFamily = fontSelect.value;
-  });
+// دکمه نویسنده
+const authorBtn = document.createElement('button');
+authorBtn.textContent = '👤';
+authorBtn.style.cssText = 'background:#eee;border:1px solid #aaa;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px';
+document.querySelector('.header-buttons')?.appendChild(authorBtn);
+authorBtn.onclick = () => $('authorModal').classList.add('active');
+$('closeAuthor').onclick = () => $('authorModal').classList.remove('active');
+$('authorModal').onclick = e => { if (e.target === $('authorModal')) $('authorModal').classList.remove('active'); };
 
-  // رندر اولیه
-  renderFiles();
-  updateInfoSummary();
+// فونت
+$('fontSelect').onchange = function() {
+  document.body.style.fontFamily = this.value;
+  localStorage.setItem('t2h_font', this.value);
+};
+const sf = localStorage.getItem('t2h_font');
+if (sf) { $('fontSelect').value = sf; document.body.style.fontFamily = sf; }
+
+// میانبر کیبورد
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key.toLowerCase() === 'a' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    $('toggleAllBtn').click();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    e.preventDefault();
+    undo();
+  }
+  if (e.key === 'Escape') {
+    $('helpModal').classList.remove('active');
+    $('authorModal').classList.remove('active');
+  }
+});
+
+// ===== مقداردهی اولیه =====
+if (!loadData()) {
+  files.push({ id: idCounter++, name: 'سلام.txt', content: 'سلام! به Text2Html خوش آمدید.\nاین یک فایل نمونه است.', category: 'آموزشی' });
+  categories.add('آموزشی');
+}
+render();
+searchDo();
+
+console.log('✅ Text2Html v4.0 - کاملاً عملیاتی');
+console.log('📊', files.length, 'فایل بارگذاری شد');
+
 </script>
-
 </body>
 </html>
