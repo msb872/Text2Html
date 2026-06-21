@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/png" href="Text2Html.png">
 <title>Text2Html</title>
+<link rel="icon" type="image/png" href="Text2Html.png">
 <style>
   body {
     font-family: Tahoma, sans-serif;
@@ -52,6 +51,16 @@
   #topButtonsContainer label {
     cursor: pointer;
     user-select: none;
+    background-color: #3498db;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 3px 6px rgba(52,152,219,0.6);
+    transition: background-color 0.3s;
+  }
+  #topButtonsContainer label:hover {
+    background-color: #2874a6;
   }
   #infoSummary {
     max-width: 900px;
@@ -370,7 +379,6 @@
   }
 </style>
 
-<!-- فقط JSZip از CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 </head>
@@ -397,13 +405,9 @@
   <button id="saveSearchResultsBtn" title="ذخیره نتایج جستجو">ذخیره نتایج جستجو</button>
   <button id="saveFilesWithSearchResultsBtn" title="ذخیره فایل‌های دارای نتیجه">ذخیره فایل‌های دارای نتیجه</button>
   <button id="exportZIPBtn" title="خروجی ZIP فایل‌ها">خروجی ZIP فایل‌ها</button>
-  <label for="importJSON" style="background:#3498db; padding:8px 16px; border-radius:8px; cursor:pointer; color:#fff; font-size:14px; box-shadow: 0 3px 6px rgba(52,152,219,0.6); transition: background-color 0.3s;">
-    وارد کردن JSON
-  </label>
+  <label for="importJSON">وارد کردن JSON</label>
   <input type="file" id="importJSON" accept=".json" style="display:none" aria-label="وارد کردن فایل JSON" />
   <button id="exportJSONBtn" title="خروجی JSON">خروجی JSON</button>
-
-  <!-- دکمه‌های جدید -->
   <button id="helpBtn" title="نمایش فایل راهنما">راهنما</button>
   <button id="authorInfoBtn" title="مشخصات نویسنده">مشخصات نویسنده</button>
 </div>
@@ -446,7 +450,6 @@
   <div id="searchResults" aria-live="polite" role="region" aria-atomic="true">عبارتی وارد نشده است.</div>
 </section>
 
-<!-- مودال راهنما -->
 <div id="helpModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle" aria-describedby="helpModalDesc">
   <div class="modalContent">
     <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
@@ -465,22 +468,21 @@
   </div>
 </div>
 
-<!-- مودال مشخصات نویسنده -->
 <div id="authorModal" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="authorModalTitle" aria-describedby="authorModalDesc">
   <div class="modalContent">
     <button class="closeModalBtn" aria-label="بستن پنجره">&times;</button>
     <h3 id="authorModalTitle">مشخصات نویسنده</h3>
     <div id="authorModalDesc">
-      <p><strong>نام:</strong> مصیب خانی</p>
-      <p><strong>موبایل:</strong> 09173206052</p>
-      <p><strong>ایمیل:</strong> Mosayeb872@gmail.vom</p>
+      <p><strong>نویسنده:</strong> مصیب خانی</p>
+      <p><strong>تماس با ما:</strong> 09173206052</p>
+      <p><strong>ایمیل:</strong> Mosayeb872@gmail.com</p>
     </div>
   </div>
 </div>
 
 <script>
-  const MAX_FILES = 30;          // محدودیت تعداد فایل
-  const MAX_FILE_SIZE = 3 * 1024 * 1024; // محدودیت حجم هر فایل (3 مگابایت)
+  const MAX_FILES = 100;          // محدودیت تعداد فایل
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // محدودیت حجم هر فایل (5 مگابایت)
 
   let files = [];
   let fileIdCounter = 1;
@@ -524,6 +526,14 @@
   const closeModalButtons = document.querySelectorAll('.closeModalBtn');
 
   let currentSearchResults = [];
+
+  // توابع کمکی
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, m => {
+      return {'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'}[m];
+    });
+  }
 
   function updateInfoSummary() {
     infoSummary.textContent = `فایل‌ها: ${files.length} | دسته‌ها: ${categories.size}`;
@@ -782,36 +792,10 @@
         editCategoryName(catTitle, cat);
       };
 
-      // دکمه جدید کپی محتوای دسته:
-      const copyCategoryBtn = document.createElement('button');
-      copyCategoryBtn.className = 'copyCategoryBtn';
-      copyCategoryBtn.textContent = 'کپی محتوای دسته';
-      copyCategoryBtn.title = `کپی محتوای تمام فایل‌های دسته "${cat}" به کلیپ‌بورد`;
-      copyCategoryBtn.style.backgroundColor = '#27ae60'; // سبز
-      copyCategoryBtn.style.marginLeft = '6px';
-      copyCategoryBtn.style.border = 'none';
-      copyCategoryBtn.style.color = 'white';
-      copyCategoryBtn.style.borderRadius = '8px';
-      copyCategoryBtn.style.padding = '6px 14px';
-      copyCategoryBtn.style.fontSize = '14px';
-      copyCategoryBtn.style.cursor = 'pointer';
-      copyCategoryBtn.style.transition = 'background-color 0.3s';
-      copyCategoryBtn.onmouseenter = () => copyCategoryBtn.style.backgroundColor = '#1e8449';
-      copyCategoryBtn.onmouseleave = () => copyCategoryBtn.style.backgroundColor = '#27ae60';
-
-      copyCategoryBtn.onclick = e => {
-        e.stopPropagation();
-        const texts = catFiles.map(f => `--- فایل: ${f.name} ---\n${f.content}`).join('\n\n');
-        navigator.clipboard.writeText(texts)
-          .then(() => alert(`محتوای تمام فایل‌های دسته "${cat}" کپی شد.`))
-          .catch(() => alert('خطا در کپی کردن محتوا.'));
-      };
-
       catHeader.appendChild(catTitle);
       catHeader.appendChild(fileCountSpan);
       catHeader.appendChild(arrowCat);
       catHeader.appendChild(delCatBtn);
-      catHeader.appendChild(copyCategoryBtn);
 
       catDiv.appendChild(catHeader);
 
@@ -930,11 +914,6 @@
     updateInfoSummary();
   }
 
-  function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, m => {
-      return {'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'}[m];
-    });
-  }
   function highlight(text, query) {
     if (!query) return escapeHtml(text);
     const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1011,13 +990,76 @@
         <title>خروجی فایل‌ها</title>
         <style>
           body { font-family: Tahoma,sans-serif; background:#f5f5f5; padding:30px; color:#222; }
-          h2 { color:#1565c0; border-bottom:2px solid #1565c0; padding-bottom:6px; margin: 0; cursor: pointer; display: flex; align-items: center; }
-          h2 .arrow { margin-left: 10px; transition: transform 0.3s ease; }
-          h2.collapsed .arrow { transform: rotate(-90deg); }
-          .category { margin-bottom: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 10px 20px; }
-          .files-container { margin-top: 10px; }
-          .fileName { font-weight: 700; margin-top: 15px; color: #34495e; }
-          pre { background:#fff; padding:15px; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.1); white-space:pre-wrap; word-break:break-word; font-family: monospace; margin-top: 6px; }
+          h2 {
+            color:#1565c0; 
+            border-bottom:2px solid #1565c0; 
+            padding-bottom:6px; 
+            margin: 0 0 10px 0; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            user-select:none;
+          }
+          h2 .arrow {
+            margin-left: 10px; 
+            transition: transform 0.3s ease;
+          }
+          h2.collapsed .arrow {
+            transform: rotate(-90deg);
+          }
+          .category {
+            margin-bottom: 30px; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            padding: 10px 20px;
+          }
+          .files-container {
+            margin-top: 10px;
+          }
+          .fileItem {
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            position: relative;
+          }
+          .fileName {
+            font-weight: 700; 
+            color: #34495e;
+            margin-bottom: 6px;
+            display: inline-block;
+          }
+          pre {
+            background:#f9f9f9; 
+            padding:15px; 
+            border-radius:7px; 
+            box-shadow:0 2px 6px rgba(0,0,0,0.05); 
+            white-space:pre-wrap; 
+            word-break:break-word; 
+            font-family: monospace; 
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+          }
+          button.copyFileBtn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s;
+          }
+          button.copyFileBtn:hover {
+            background-color: #2874a6;
+          }
           #toggleAllBtn {
             background-color: #3498db;
             color: white;
@@ -1044,11 +1086,17 @@
       const catFiles = files.filter(f => f.category === cat);
       if(catFiles.length === 0) return;
       htmlContent += `<section class="category">
-        <h2 tabindex="0" role="button" aria-expanded="true">${escapeHtml(cat)}<span class="arrow">▼</span></h2>
+        <h2 tabindex="0" role="button" aria-expanded="true"><span class="arrow">▼</span>${escapeHtml(cat)}</h2>
         <div class="files-container">
       `;
       catFiles.forEach(file => {
-        htmlContent += `<div class="fileName">${escapeHtml(file.name)}</div><pre>${escapeHtml(file.content)}</pre>`;
+        htmlContent += `
+          <div class="fileItem">
+            <span class="fileName">${escapeHtml(file.name)}</span>
+            <button class="copyFileBtn" type="button" aria-label="کپی محتوای فایل ${escapeHtml(file.name)}">کپی محتوا</button>
+            <pre>${escapeHtml(file.content)}</pre>
+          </div>
+        `;
       });
       htmlContent += `</div></section>`;
     });
@@ -1063,17 +1111,16 @@
           allOpen = !allOpen;
           categories.forEach(cat => {
             const header = cat.querySelector('h2');
+            const arrow = header.querySelector('.arrow');
             const content = cat.querySelector('.files-container');
             if (allOpen) {
               content.style.display = 'block';
               header.setAttribute('aria-expanded', 'true');
-              header.classList.remove('collapsed');
-              header.querySelector('.arrow').textContent = '▼';
+              arrow.textContent = '▼';
             } else {
               content.style.display = 'none';
               header.setAttribute('aria-expanded', 'false');
-              header.classList.add('collapsed');
-              header.querySelector('.arrow').textContent = '▶';
+              arrow.textContent = '▶';
             }
           });
           toggleAllBtn.setAttribute('aria-pressed', allOpen.toString());
@@ -1081,19 +1128,18 @@
 
         categories.forEach(cat => {
           const header = cat.querySelector('h2');
+          const arrow = header.querySelector('.arrow');
           const content = cat.querySelector('.files-container');
           header.addEventListener('click', () => {
-            const isOpen = content.style.display !== 'none';
-            if (isOpen) {
+            const isVisible = content.style.display !== 'none';
+            if (isVisible) {
               content.style.display = 'none';
               header.setAttribute('aria-expanded', 'false');
-              header.classList.add('collapsed');
-              header.querySelector('.arrow').textContent = '▶';
+              arrow.textContent = '▶';
             } else {
               content.style.display = 'block';
               header.setAttribute('aria-expanded', 'true');
-              header.classList.remove('collapsed');
-              header.querySelector('.arrow').textContent = '▼';
+              arrow.textContent = '▼';
             }
           });
           header.addEventListener('keydown', e => {
@@ -1101,6 +1147,20 @@
               e.preventDefault();
               header.click();
             }
+          });
+
+          // دکمه‌های کپی فایل
+          const copyBtns = cat.querySelectorAll('button.copyFileBtn');
+          copyBtns.forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const pre = btn.nextElementSibling;
+              if (!pre) return;
+              const textToCopy = pre.textContent;
+              navigator.clipboard.writeText(textToCopy)
+                .then(() => alert('محتوای فایل کپی شد.'))
+                .catch(() => alert('خطا در کپی کردن محتوا.'));
+            });
           });
         });
       <\/script>
@@ -1219,7 +1279,6 @@
           alert('فایل JSON معتبر نیست.');
           return;
         }
-        // بررسی تعداد فایل‌ها
         if (data.files.length > MAX_FILES) {
           alert(`فایل JSON بیش از ${MAX_FILES} فایل دارد.`);
           return;
@@ -1242,7 +1301,7 @@
       }
     };
     reader.readAsText(file);
-    e.target.value = ''; // پاک کردن انتخاب فایل
+    e.target.value = '';
   });
 
   // افزودن فایل به صورت دستی
@@ -1256,7 +1315,6 @@
       manualFileNameInput.focus();
       return;
     }
-    // بررسی فرمت فایل
     const ext = name.split('.').pop().toLowerCase();
     if (!['txt', 'bat', 'css', 'js'].includes(ext)) {
       alert('پسوند فایل باید یکی از موارد txt، bat، css، js باشد.');
@@ -1266,7 +1324,6 @@
 
     if (!category) category = 'دسته‌بندی نشده';
 
-    // بررسی تکراری بودن نام فایل در دسته
     if (files.some(f => f.category === category && f.name === name)) {
       alert('نام فایل در این دسته‌بندی تکراری است.');
       manualFileNameInput.focus();
@@ -1341,10 +1398,9 @@
     document.body.style.fontFamily = fontSelect.value;
   });
 
-  // شروع رندر اولیه
+  // رندر اولیه
   renderFiles();
   updateInfoSummary();
-
 </script>
 
 </body>
