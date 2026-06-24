@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -465,28 +467,6 @@
     border-radius: 3px;
   }
 
-  .search-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-  }
-  .search-actions button {
-    padding: 8px 18px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-  }
-  .search-actions button:hover {
-    background: var(--primary-dark);
-  }
-  .search-actions .success { background: var(--success); }
-  .search-actions .warning { background: var(--warning); color: #333; }
-
   .modal {
     display: none;
     position: fixed;
@@ -669,10 +649,6 @@
     <div class="search-results" id="searchResults">
       <p style="color:#888">عبارتی وارد نشده است.</p>
     </div>
-    <div class="search-actions" id="searchActions" style="display:none;">
-      <button id="saveSearchAsCategoryBtn" class="success">📁 ذخیره فایل‌های دارای عبارت به عنوان دسته</button>
-      <button id="saveSearchAsTextBtn" class="warning">📄 ذخیره متن نتایج جستجو</button>
-    </div>
   </div>
 
 </div>
@@ -692,7 +668,6 @@
       <li><b>جستجو:</b> با تایپ عبارت، نتایج نمایش داده می‌شود</li>
       <li><b>پرینت و کپی:</b> در خروجی HTML دکمه‌های مجزا برای هر فایل و دسته</li>
       <li><b>باز و بسته شدن:</b> روی عنوان دسته کلیک کنید تا محتوای آن باز/بسته شود</li>
-      <li><b>ذخیره نتایج جستجو:</b> بعد از جستجو، می‌توانید فایل‌های دارای عبارت را به عنوان دسته جدید ذخیره کنید یا متن نتایج را به صورت فایل متنی دانلود کنید.</li>
     </ul>
   </div>
 </div>
@@ -734,9 +709,6 @@ const filesList = $('filesList');
 const infoBar = $('infoBar');
 const searchInput = $('searchInput');
 const searchResultsDiv = $('searchResults');
-const searchActions = $('searchActions');
-const saveSearchAsCategoryBtn = $('saveSearchAsCategoryBtn');
-const saveSearchAsTextBtn = $('saveSearchAsTextBtn');
 const toastContainer = $('toastContainer');
 
 // ===== توابع پایه =====
@@ -1172,8 +1144,6 @@ let searchTimer = null;
 function searchDo() {
   const q = searchInput.value.trim();
   searchResultsDiv.innerHTML = '';
-  searchActions.style.display = 'none';
-  
   if (!q) {
     searchResultsDiv.innerHTML = '<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';
     searchResults = [];
@@ -1195,9 +1165,6 @@ function searchDo() {
     searchResults = [];
     return;
   }
-
-  // نمایش دکمه‌ها
-  searchActions.style.display = 'flex';
 
   const count = document.createElement('div');
   count.style.cssText = 'font-weight:700;margin-bottom:8px;color:var(--primary-light)';
@@ -1232,57 +1199,100 @@ searchInput.addEventListener('keydown', e => {
   if (e.key === 'Escape') { searchInput.value = ''; searchDo(); }
 });
 
-// ===== ذخیره نتایج جستجو به عنوان دسته =====
-saveSearchAsCategoryBtn.onclick = function() {
-  const q = searchInput.value.trim();
-  const results = searchResults;
-  if (!results || results.length === 0) {
-    toast('هیچ نتیجه جستجویی برای ذخیره وجود ندارد', 'warning');
+// ===== افزودن فایل =====
+function addFiles(fileList) {
+  if (files.length + fileList.length > MAX_FILES) {
+    toast(`❌ حداکثر ${MAX_FILES} فایل`, 'error');
     return;
   }
-  const categoryName = `نتایج جستجو: ${q.substring(0, 30)}`;
-  if (categories.has(categoryName)) {
-    toast('این دسته قبلاً وجود دارد. ابتدا آن را حذف کنید یا عبارت دیگری جستجو کنید.', 'warning');
-    return;
+  let cat = catInput.value.trim();
+  if (!cat) cat = 'دسته‌بندی نشده';
+  categories.add(cat);
+
+  let done = 0, total = fileList.length, errors = 0;
+
+  function check() {
+    if (done === total) {
+      updateCatList();
+      render();
+      catInput.value = '';
+      fileInput.value = '';
+      searchDo();
+      saveData();
+      if (total - errors > 0) toast(`✅ ${total - errors} فایل اضافه شد`, 'success');
+    }
   }
-  // استخراج فایل‌های منحصربه‌فرد از نتایج
-  const uniqueFileIds = [...new Set(results.map(r => r.id))];
-  const filesToAdd = files.filter(f => uniqueFileIds.includes(f.id));
-  // کپی کردن فایل‌ها در دسته جدید (با id جدید)
-  const newFiles = filesToAdd.map(f => ({
-    id: idCounter++,
-    name: f.name,
-    content: f.content,
-    category: categoryName
-  }));
-  files.push(...newFiles);
-  categories.add(categoryName);
+
+  Array.from(fileList).forEach(file => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!ACCEPTED.includes(ext)) {
+      toast(`❌ فرمت ${file.name} مجاز نیست`, 'error');
+      done++; errors++; check();
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      toast(`❌ ${file.name} حجیم است`, 'error');
+      done++; errors++; check();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      files.push({ id: idCounter++, name: file.name, content: e.target.result, category: cat });
+      done++; check();
+    };
+    reader.onerror = () => { done++; errors++; check(); };
+    reader.readAsText(file);
+  });
+}
+
+// ===== رویدادها =====
+
+// درگ و دراپ
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+dropArea.addEventListener('dragleave', e => { e.preventDefault(); dropArea.classList.remove('dragover'); });
+dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+
+$('selectFilesBtn').onclick = () => fileInput.click();
+$('addFilesBtn').onclick = () => {
+  if (fileInput.files.length === 0) { toast('فایلی انتخاب نشده', 'warning'); return; }
+  addFiles(fileInput.files);
+};
+
+// افزودن دستی
+$('manualAddBtn').onclick = () => {
+  const name = $('manualName').value.trim();
+  let cat = $('manualCat').value.trim();
+  const content = $('manualContent').value;
+
+  if (!name) { toast('نام فایل را وارد کنید', 'warning'); $('manualName').focus(); return; }
+  const ext = name.split('.').pop().toLowerCase();
+  if (!ACCEPTED.includes(ext)) { toast('فرمت مجاز نیست', 'warning'); $('manualName').focus(); return; }
+  if (!cat) cat = 'دسته‌بندی نشده';
+  if (files.some(f => f.category === cat && f.name === name)) { toast('نام تکراری است', 'warning'); return; }
+  if (content.length > MAX_SIZE) { toast('محتوا حجیم است', 'warning'); return; }
+  if (files.length >= MAX_FILES) { toast('ظرفیت پر است', 'error'); return; }
+
+  files.push({ id: idCounter++, name, content, category: cat });
+  categories.add(cat);
   updateCatList();
   render();
   searchDo();
   saveData();
-  toast(`✅ ${newFiles.length} فایل در دسته "${categoryName}" ذخیره شد`, 'success');
+  $('manualName').value = '';
+  $('manualCat').value = '';
+  $('manualContent').value = '';
+  toast(`✅ "${name}" اضافه شد`, 'success');
 };
 
-// ===== ذخیره نتایج جستجو به عنوان فایل متنی =====
-saveSearchAsTextBtn.onclick = function() {
-  const q = searchInput.value.trim();
-  const results = searchResults;
-  if (!results || results.length === 0) {
-    toast('هیچ نتیجه جستجویی برای ذخیره وجود ندارد', 'warning');
-    return;
-  }
-  let text = `نتایج جستجو برای: "${q}"\n`;
-  text += `تاریخ: ${new Date().toLocaleDateString('fa-IR')}\n`;
-  text += `${'='.repeat(50)}\n\n`;
-  results.forEach(r => {
-    text += `فایل: ${r.name}\nدسته: ${r.cat}\nخط ${r.line}: ${r.text}\n\n`;
-  });
-  download(`نتایج_جستجو_${q.substring(0, 20).replace(/[\\/:*?"<>|]/g, '_')}.txt`, text, 'text/plain');
-  toast('✅ فایل متنی نتایج دانلود شد', 'success');
+// دکمه‌های هدر
+$('toggleAllBtn').onclick = () => {
+  const allOpen = [...categories].every(c => openStates[c] !== false);
+  categories.forEach(c => { openStates[c] = allOpen ? false : true; });
+  render(); saveData();
+  toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
 };
 
-// ===== خروجی HTML =====
+// ===== خروجی HTML با قابلیت باز و بسته شدن =====
 $('exportHtmlBtn').onclick = () => {
   if (files.length === 0) { toast('❌ فایلی برای خروجی وجود ندارد.', 'error'); return; }
 
