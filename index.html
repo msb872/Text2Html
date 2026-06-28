@@ -3,130 +3,114 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Text2Html v5.0 - کامل</title>
+<title>Text2Html v5.0 - نهایی با باز/بسته شدن کامل</title>
 <style>
-  /* استایل‌ها */
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{--primary:#3498db;--primary-dark:#2980b9;--primary-light:#1565c0;--bg:#f0f4f8;--card:#fff;--text:#333;--text-light:#666;--border:#ddd;--radius:10px;--danger:#e74c3c;--success:#27ae60;--warning:#f39c12}
-  body{font-family:Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;transition:.3s}
-  body.dark{--bg:#1a1a2e;--card:#16213e;--text:#e0e0e0;--text-light:#aaa;--border:#2a2a4a}
-  .header{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--card);box-shadow:0 2px 10px rgba(0,0,0,.1);padding:10px 20px}
-  .header-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  .header-title{font-size:20px;font-weight:700;color:var(--primary-light)}
-  .header-buttons{display:flex;gap:6px;flex-wrap:wrap}
-  .header-buttons button,.header-buttons label{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:13px;background:var(--primary);color:#fff;transition:.2s}
-  .header-buttons button:hover,.header-buttons label:hover{background:var(--primary-dark)}
-  .header-buttons .danger{background:var(--danger)}
-  .header-buttons .success{background:var(--success)}
-  .font-select{display:flex;align-items:center;gap:4px;font-size:13px}
-  .font-select select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)}
-  .main{max-width:1000px;margin:70px auto 0;padding:20px}
-  .info-bar{background:var(--card);padding:10px 15px;border-radius:var(--radius);margin-bottom:15px;font-weight:700;color:var(--primary-light);text-align:center}
-  .drop-area{border:2px dashed var(--border);background:var(--card);border-radius:var(--radius);padding:25px;margin-bottom:20px;text-align:center;transition:.3s}
-  .drop-area.dragover{border-color:var(--primary);background:#e8f4fd}
-  body.dark .drop-area.dragover{background:#1a2744}
-  .drop-area p{margin-bottom:15px;color:var(--text-light)}
-  .drop-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
-  .drop-controls input[type="text"]{padding:8px 12px;border:2px solid var(--primary);border-radius:6px;font-size:14px;width:200px;outline:none;background:var(--card);color:var(--text)}
-  .drop-controls button{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px;background:var(--primary);color:#fff;transition:.2s}
-  .drop-controls button:hover{background:var(--primary-dark)}
-  .manual-section{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:20px}
-  .manual-section h3{color:var(--primary-light);margin-bottom:15px}
-  .manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
-  .manual-grid label{display:block;margin-bottom:5px;font-weight:700;font-size:14px}
-  .manual-grid input{width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:6px;font-size:14px;outline:none;background:var(--card);color:var(--text)}
-  .manual-grid input:focus{border-color:var(--primary)}
-  .manual-section textarea{width:100%;padding:10px;border:2px solid var(--border);border-radius:6px;font-size:14px;font-family:monospace;resize:vertical;min-height:100px;outline:none;background:var(--card);color:var(--text);margin-bottom:15px}
-  .manual-section textarea:focus{border-color:var(--primary)}
-  .manual-section button{padding:10px 25px;border:none;border-radius:6px;cursor:pointer;font-size:15px;background:var(--primary);color:#fff;transition:.2s}
-  .manual-section button:hover{background:var(--primary-dark)}
-  .category-box{background:var(--card);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
-  .category-header{display:flex;align-items:center;padding:12px 18px;cursor:pointer;user-select:none;gap:10px;flex-wrap:wrap}
-  .category-header .arrow{font-size:14px;transition:.3s;color:var(--primary)}
-  .category-header .arrow.collapsed{transform:rotate(-90deg)}
-  .category-header h2{flex:1;font-size:17px;color:var(--primary-light);cursor:text}
-  .category-header .count{font-size:13px;color:var(--text-light);background:var(--bg);padding:2px 10px;border-radius:20px}
-  .category-header .cat-actions button{padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px;transition:.2s;color:var(--text)}
-  .category-header .cat-actions button:hover{border-color:var(--primary);color:var(--primary)}
-  .category-header .cat-actions .danger:hover{border-color:var(--danger);color:var(--danger)}
-  .files-container{padding:0 18px 14px;border-right:3px solid var(--primary-light);margin-right:18px}
-  .file-item{background:var(--bg);border-radius:8px;margin-bottom:10px;overflow:hidden}
-  .file-header{display:flex;align-items:center;padding:8px 14px;cursor:pointer;gap:8px;flex-wrap:wrap}
-  .file-header .arrow{font-size:12px;transition:.3s;color:var(--primary)}
-  .file-header .arrow.open{transform:rotate(90deg)}
-  .file-header .fname{flex:1;font-weight:600;font-size:14px;cursor:text}
-  .file-header .file-actions{display:flex;gap:5px}
-  .file-header .file-actions button{padding:4px 10px;border:none;border-radius:5px;cursor:pointer;font-size:12px;background:var(--primary);color:#fff;transition:.2s}
-  .file-header .file-actions button:hover{background:var(--primary-dark)}
-  .file-header .file-actions .success{background:var(--success)}
-  .file-header .file-actions .danger{background:var(--danger)}
-  .file-header .file-actions .warning{background:var(--warning);color:#333}
-  .file-content{display:none;padding:10px 14px 14px;border-top:2px solid var(--primary-light)}
-  .file-content textarea{width:100%;height:120px;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:monospace;font-size:13px;resize:vertical;outline:none;background:var(--card);color:var(--text)}
-  .file-content textarea:focus{border-color:var(--primary)}
-  .file-content .content-actions{display:flex;gap:8px;margin-top:8px}
-  .file-content .content-actions button{padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;background:var(--primary);color:#fff;transition:.2s}
-  .file-content .content-actions button:hover{background:var(--primary-dark)}
-  .search-section{background:var(--card);border-radius:var(--radius);padding:20px;margin:20px 0 40px}
-  .search-section h3{color:var(--primary-light);margin-bottom:12px}
-  .search-section input{width:100%;max-width:400px;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--card);color:var(--text)}
-  .search-section input:focus{border-color:var(--primary)}
-  .search-results{margin-top:15px;max-height:300px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:14px}
-  .search-results div{padding:8px 0;border-bottom:1px solid var(--border)}
-  .search-results div:last-child{border-bottom:none}
-  mark{background:#fff59d;color:#7b6f00;padding:0 3px;border-radius:3px}
-  body.dark mark{background:#5a4f00;color:#fff59d}
-  .search-actions{display:none;margin-top:15px;gap:10px;flex-wrap:wrap;align-items:center}
-  .search-actions.show{display:flex}
-  .search-action-btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
-  .search-action-btn:hover{opacity:.85;transform:translateY(-1px)}
-  .search-action-btn.success{background:var(--success);color:#fff}
-  .search-action-btn.primary{background:var(--primary);color:#fff}
-  .search-action-btn.warning{background:var(--warning);color:#333}
-  .search-stats{font-size:13px;color:var(--text-light);align-self:center}
-  .search-notice{background:var(--card);border:1px solid var(--primary);border-radius:6px;padding:10px 15px;margin-top:10px;font-size:13px;color:var(--primary-light);display:none;animation:fadeIn .3s}
-  .search-notice.show{display:block}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-  .modal{display:none;position:fixed;z-index:2000;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.4);justify-content:center;align-items:center}
-  .modal.active{display:flex}
-  .modal-content{background:var(--card);border-radius:var(--radius);max-width:450px;width:90%;padding:25px;position:relative}
-  .modal-content h3{color:var(--primary-light);margin-bottom:15px}
-  .modal-content .close{position:absolute;top:10px;left:15px;font-size:24px;cursor:pointer;background:none;border:none;color:var(--text-light)}
-  .modal-content ul{padding-right:20px;line-height:1.8}
-  .toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;gap:8px;align-items:center}
-  .toast{background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none}
-  .toast.show{opacity:1;transform:translateY(0)}
-  .toast.success{background:var(--success)}
-  .toast.error{background:var(--danger)}
-  .toast.warning{background:var(--warning);color:#333}
-  .inline-edit{padding:4px 8px;border:2px solid var(--primary);border-radius:6px;font-size:inherit;font-family:inherit;outline:none;width:100%;max-width:250px;background:var(--card);color:var(--text)}
-  .progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;display:none}
-  .progress-bar .fill{height:100%;background:var(--primary);transition:width .3s;width:0%}
-  @media(max-width:700px){.header-inner{flex-direction:column;align-items:stretch}.header-buttons{justify-content:center}.main{margin-top:120px;padding:12px}.manual-grid{grid-template-columns:1fr}.search-actions{flex-direction:column}.search-action-btn{width:100%}}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --primary: #3498db; --primary-dark: #2980b9; --primary-light: #1565c0; --bg: #f0f4f8; --card: #fff; --text: #333; --text-light: #666; --border: #ddd; --radius: 10px; --danger: #e74c3c; --success: #27ae60; --warning: #f39c12; }
+  body { font-family: Tahoma, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; direction: rtl; transition: .3s; }
+  body.dark { --bg: #1a1a2e; --card: #16213e; --text: #e0e0e0; --text-light: #aaa; --border: #2a2a4a; }
+  .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--card); box-shadow: 0 2px 10px rgba(0,0,0,.1); padding: 10px 20px; }
+  .header-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .header-title { font-size: 20px; font-weight: 700; color: var(--primary-light); }
+  .header-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+  .header-buttons button, .header-buttons label { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; background: var(--primary); color: #fff; transition: .2s; }
+  .header-buttons button:hover, .header-buttons label:hover { background: var(--primary-dark); }
+  .header-buttons .danger { background: var(--danger); }
+  .header-buttons .success { background: var(--success); }
+  .main { max-width: 1000px; margin: 70px auto 0; padding: 20px; }
+  .info-bar { background: var(--card); padding: 10px 15px; border-radius: var(--radius); margin-bottom: 15px; font-weight: 700; color: var(--primary-light); text-align: center; }
+  .drop-area { border: 2px dashed var(--border); background: var(--card); border-radius: var(--radius); padding: 25px; margin-bottom: 20px; text-align: center; transition: .3s; }
+  .drop-area.dragover { border-color: var(--primary); background: #e8f4fd; }
+  .drop-controls { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .drop-controls input[type="text"] { padding: 8px 12px; border: 2px solid var(--primary); border-radius: 6px; font-size: 14px; width: 200px; outline: none; background: var(--card); color: var(--text); }
+  .drop-controls button { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; background: var(--primary); color: #fff; transition: .2s; }
+  .drop-controls button:hover { background: var(--primary-dark); }
+  .manual-section { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+  .manual-section h3 { color: var(--primary-light); margin-bottom: 15px; }
+  .manual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+  .manual-grid label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 14px; }
+  .manual-grid input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px; outline: none; background: var(--card); color: var(--text); }
+  .manual-grid input:focus { border-color: var(--primary); }
+  .manual-section textarea { width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px; font-family: monospace; resize: vertical; min-height: 100px; outline: none; background: var(--card); color: var(--text); margin-bottom: 15px; }
+  .manual-section textarea:focus { border-color: var(--primary); }
+  .manual-section button { padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; background: var(--primary); color: #fff; transition: .2s; }
+  .manual-section button:hover { background: var(--primary-dark); }
+  .category-box { background: var(--card); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+  .category-header { display: flex; align-items: center; padding: 12px 18px; cursor: pointer; user-select: none; gap: 10px; flex-wrap: wrap; }
+  .category-header .arrow { font-size: 14px; transition: .3s; color: var(--primary); }
+  .category-header .arrow.collapsed { transform: rotate(-90deg); }
+  .category-header h2 { flex: 1; font-size: 17px; color: var(--primary-light); cursor: text; }
+  .category-header .count { font-size: 13px; color: var(--text-light); background: var(--bg); padding: 2px 10px; border-radius: 20px; }
+  .category-header .cat-actions button { padding: 4px 10px; border: 1px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; font-size: 12px; transition: .2s; color: var(--text); }
+  .category-header .cat-actions button:hover { border-color: var(--primary); color: var(--primary); }
+  .category-header .cat-actions .danger:hover { border-color: var(--danger); color: var(--danger); }
+  .files-container { padding: 0 18px 14px; border-right: 3px solid var(--primary-light); margin-right: 18px; }
+  .file-item { background: var(--bg); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .file-header { display: flex; align-items: center; padding: 8px 14px; cursor: pointer; gap: 8px; flex-wrap: wrap; }
+  .file-header .arrow { font-size: 12px; transition: .3s; color: var(--primary); }
+  .file-header .arrow.open { transform: rotate(90deg); }
+  .file-header .fname { flex: 1; font-weight: 600; font-size: 14px; cursor: text; }
+  .file-header .file-actions { display: flex; gap: 5px; }
+  .file-header .file-actions button { padding: 4px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; background: var(--primary); color: #fff; transition: .2s; }
+  .file-header .file-actions button:hover { background: var(--primary-dark); }
+  .file-header .file-actions .success { background: var(--success); }
+  .file-header .file-actions .danger { background: var(--danger); }
+  .file-header .file-actions .warning { background: var(--warning); color: #333; }
+  .file-content { display: none; padding: 10px 14px 14px; border-top: 2px solid var(--primary-light); }
+  .file-content textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: monospace; font-size: 13px; resize: vertical; outline: none; background: var(--card); color: var(--text); }
+  .file-content textarea:focus { border-color: var(--primary); }
+  .file-content .content-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .file-content .content-actions button { padding: 5px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; background: var(--primary); color: #fff; transition: .2s; }
+  .file-content .content-actions button:hover { background: var(--primary-dark); }
+  .search-section { background: var(--card); border-radius: var(--radius); padding: 20px; margin: 20px 0 40px; }
+  .search-section h3 { color: var(--primary-light); margin-bottom: 12px; }
+  .search-section input { width: 100%; max-width: 400px; padding: 10px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; background: var(--card); color: var(--text); }
+  .search-section input:focus { border-color: var(--primary); }
+  .search-results { margin-top: 15px; max-height: 300px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 14px; }
+  .search-results div { padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .search-results div:last-child { border-bottom: none; }
+  mark { background: #fff59d; color: #7b6f00; padding: 0 3px; border-radius: 3px; }
+  body.dark mark { background: #5a4f00; color: #fff59d; }
+  .search-actions { display: none; margin-top: 15px; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .search-actions.show { display: flex; }
+  .search-action-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: .2s; }
+  .search-action-btn:hover { opacity: .85; transform: translateY(-1px); }
+  .search-action-btn.success { background: var(--success); color: #fff; }
+  .search-action-btn.primary { background: var(--primary); color: #fff; }
+  .search-action-btn.warning { background: var(--warning); color: #333; }
+  .search-action-btn.print { background: #e67e22; color: #fff; }
+  .search-stats { font-size: 13px; color: var(--text-light); align-self: center; }
+  .search-notice { background: var(--card); border: 1px solid var(--primary); border-radius: 6px; padding: 10px 15px; margin-top: 10px; font-size: 13px; color: var(--primary-light); display: none; animation: fadeIn .3s; }
+  .search-notice.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); justify-content: center; align-items: center; }
+  .modal.active { display: flex; }
+  .modal-content { background: var(--card); border-radius: var(--radius); max-width: 450px; width: 90%; padding: 25px; position: relative; }
+  .modal-content h3 { color: var(--primary-light); margin-bottom: 15px; }
+  .modal-content .close { position: absolute; top: 10px; left: 15px; font-size: 24px; cursor: pointer; background: none; border: none; color: var(--text-light); }
+  .modal-content ul { padding-right: 20px; line-height: 1.8; }
+  .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .toast { background: #333; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; opacity: 0; transform: translateY(20px); transition: .3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+  .toast.warning { background: var(--warning); color: #333; }
+  .inline-edit { padding: 4px 8px; border: 2px solid var(--primary); border-radius: 6px; font-size: inherit; font-family: inherit; outline: none; width: 100%; max-width: 250px; background: var(--card); color: var(--text); }
+  .progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; display: none; }
+  .progress-bar .fill { height: 100%; background: var(--primary); transition: width .3s; width: 0%; }
+  @media (max-width: 700px) { .header-inner { flex-direction: column; align-items: stretch; } .header-buttons { justify-content: center; } .main { margin-top: 120px; padding: 12px; } .manual-grid { grid-template-columns: 1fr; } .search-actions { flex-direction: column; } .search-action-btn { width: 100%; } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-
 <header class="header">
   <div class="header-inner">
     <div class="header-title">📄 Text2Html v5</div>
-    <div class="font-select">
-      <span>فونت:</span>
-      <select id="fontSelect">
-        <option value="Tahoma, sans-serif">Tahoma</option>
-        <option value="Arial, sans-serif">Arial</option>
-        <option value="Courier New, monospace">Courier New</option>
-        <option value="Times New Roman, serif">Times New Roman</option>
-        <option value="Segoe UI, sans-serif">Segoe UI</option>
-        <option value="Verdana, sans-serif">Verdana</option>
-      </select>
-    </div>
     <div class="header-buttons">
       <button id="toggleAllBtn">📂 همه</button>
       <button id="exportHtmlBtn">🌐 HTML</button>
       <button id="exportJsonBtn">📋 JSON</button>
-      <label for="importJsonInput" id="importJsonLabel" style="user-select:none;cursor:pointer;">📥 JSON</label>
+      <label for="importJsonInput" style="padding:6px 12px;background:var(--primary);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;user-select:none">📥 JSON</label>
       <input type="file" id="importJsonInput" accept=".json" style="display:none">
       <button id="exportZipBtn">📦 ZIP</button>
       <button id="saveFilesBtn">💾 ذخیره</button>
@@ -137,10 +121,8 @@
     </div>
   </div>
 </header>
-
 <div class="main">
   <div class="info-bar" id="infoBar">⏳ در حال بارگذاری...</div>
-
   <div class="drop-area" id="dropArea">
     <p>📂 فایل‌های خود را اینجا بکشید و رها کنید</p>
     <div class="drop-controls">
@@ -153,42 +135,31 @@
     <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
     <p style="font-size:12px;color:#888;margin-top:8px">فرمت‌ها: txt, bat, css, js, html, json, xml, md, csv, log</p>
   </div>
-
   <div class="manual-section">
     <h3>✏️ افزودن فایل دستی</h3>
     <div class="manual-grid">
-      <div>
-        <label for="manualName">نام فایل:</label>
-        <input type="text" id="manualName" placeholder="مثلاً script.js">
-      </div>
-      <div>
-        <label for="manualCat">دسته‌بندی:</label>
-        <input type="text" id="manualCat" list="catList" placeholder="انتخاب یا ایجاد">
-      </div>
+      <div><label for="manualName">نام فایل:</label><input type="text" id="manualName" placeholder="مثلاً script.js"></div>
+      <div><label for="manualCat">دسته‌بندی:</label><input type="text" id="manualCat" list="catList" placeholder="انتخاب یا ایجاد"></div>
     </div>
     <label for="manualContent">محتوای فایل:</label>
     <textarea id="manualContent" placeholder="محتوای فایل را وارد کنید..."></textarea>
     <button id="manualAddBtn">➕ افزودن فایل دستی</button>
   </div>
-
   <div id="filesList"></div>
-
   <div class="search-section">
     <h3>🔍 جستجو در محتوای فایل‌ها</h3>
     <input type="text" id="searchInput" placeholder="عبارت جستجو..." autocomplete="off">
-    <div class="search-results" id="searchResults">
-      <p style="color:#888">عبارتی وارد نشده است.</p>
-    </div>
+    <div class="search-results" id="searchResults"><p style="color:#888">عبارتی وارد نشده است.</p></div>
     <div class="search-actions" id="searchActions">
       <button class="search-action-btn success" id="saveSearchResultsBtn">💾 ذخیره نتایج جستجو</button>
       <button class="search-action-btn primary" id="saveSearchTextsBtn">📄 ذخیره متن‌های شامل عبارت</button>
       <button class="search-action-btn warning" id="saveSearchJsonBtn">📋 ذخیره نتایج (JSON)</button>
+      <button class="search-action-btn print" id="printSearchResultsBtn">🖨️ پرینت نتایج جستجو</button>
       <span class="search-stats" id="searchStats"></span>
     </div>
     <div class="search-notice" id="searchNotice"></div>
   </div>
 </div>
-
 <div class="modal" id="helpModal">
   <div class="modal-content">
     <button class="close" id="closeHelp">&times;</button>
@@ -206,714 +177,217 @@
     </ul>
   </div>
 </div>
-
 <div class="modal" id="authorModal">
   <div class="modal-content">
     <button class="close" id="closeAuthor">&times;</button>
     <h3>👤 نویسنده</h3>
-    <p><b>نام:</b> مصیب خانی</p>
-    <p><b>تلفن:</b> ۰۹۱۷۳۲۰۶۰۵۲</p>
-    <p><b>ایمیل:</b> Mosayeb872@gmail.com</p>
-    <p><b>نسخه:</b> ۵.۰ (نهایی)</p>
+    <p><b>نام:</b> مصیب خانی</p><p><b>تلفن:</b> ۰۹۱۷۳۲۰۶۰۵۲</p><p><b>ایمیل:</b> Mosayeb872@gmail.com</p><p><b>نسخه:</b> ۵.۰ (نهایی)</p>
   </div>
 </div>
-
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-const MAX_FILES = 500;
-const MAX_SIZE = 10 * 1024 * 1024;
+const MAX_FILES = 500; const MAX_SIZE = 10*1024*1024;
 const ACCEPTED = ['txt','bat','css','js','html','json','xml','md','csv','log'];
-let files = [];
-let idCounter = 1;
-let categories = new Set();
-let openStates = {};
-let undoData = null;
-let searchResults = [];
-let searchTimer = null;
+let files = []; let idCounter = 1; let categories = new Set(); let openStates = {}; let undoData = null; let searchResults = []; let searchTimer = null;
 
-function escapeHtml(t) {
-  if(!t) return '';
-  return t.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; });
-}
+function escapeHtml(t){if(!t)return '';return t.replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];});}
 
-function toast(msg, type, dur) {
-  type = type || 'info';
-  dur = dur || 2500;
-  var el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
-  document.getElementById('toastContainer').appendChild(el);
-  requestAnimationFrame(function(){ el.classList.add('show'); });
-  setTimeout(function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 300); }, dur);
-}
+function toast(msg,type,dur){type=type||'info';dur=dur||2500;var el=document.createElement('div');el.className='toast '+type;el.textContent=msg;document.getElementById('toastContainer').appendChild(el);requestAnimationFrame(function(){el.classList.add('show');});setTimeout(function(){el.classList.remove('show');setTimeout(function(){el.remove();},300);},dur);}
 
-function download(name, content, mime) {
-  var blob = new Blob([content], {type: mime + ';charset=utf-8'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 100);
-}
+function download(name,content,mime){var blob=new Blob([content],{type:mime+';charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},100);}
 
-function updateInfo() {
-  var bar = document.getElementById('infoBar');
-  if(bar) bar.textContent = '📊 فایل‌ها: ' + files.length + ' | دسته‌ها: ' + categories.size;
-}
+function updateInfo(){var bar=document.getElementById('infoBar');if(bar)bar.textContent='📊 فایل‌ها: '+files.length+' | دسته‌ها: '+categories.size;}
 
-function updateCatList() {
-  var list = document.getElementById('catList');
-  if(!list) return;
-  list.innerHTML = '';
-  var arr = Array.from(categories).sort();
-  for(var i=0; i<arr.length; i++) {
-    var opt = document.createElement('option');
-    opt.value = arr[i];
-    list.appendChild(opt);
-  }
-}
+function updateCatList(){var list=document.getElementById('catList');if(!list)return;list.innerHTML='';var arr=Array.from(categories).sort();for(var i=0;i<arr.length;i++){var opt=document.createElement('option');opt.value=arr[i];list.appendChild(opt);}}
 
-function saveToDB() {
-  try {
-    var data = { files: files, openStates: openStates, idCounter: idCounter };
-    localStorage.setItem('t2h_v5_full', JSON.stringify(data));
-  } catch(e) {}
-}
+function saveToDB(){try{var data={files:files,openStates:openStates,idCounter:idCounter};localStorage.setItem('t2h_v5_full',JSON.stringify(data));}catch(e){}}
 
-function loadFromDB() {
-  try {
-    var raw = localStorage.getItem('t2h_v5_full');
-    if(!raw) return false;
-    var data = JSON.parse(raw);
-    if(data.files && data.files.length > 0) {
-      files = data.files;
-      openStates = data.openStates || {};
-      idCounter = data.idCounter || Math.max.apply(null, files.map(f => f.id || 0)) + 1;
-      if(isNaN(idCounter)) idCounter = 1;
-      categories = new Set(files.map(f => f.category));
-      return true;
-    }
-  } catch(e) {}
-  return false;
-}
+function loadFromDB(){try{var raw=localStorage.getItem('t2h_v5_full');if(!raw)return false;var data=JSON.parse(raw);if(data.files&&data.files.length>0){files=data.files;openStates=data.openStates||{};idCounter=data.idCounter||Math.max.apply(null,files.map(f=>f.id||0))+1;if(isNaN(idCounter))idCounter=1;categories=new Set(files.map(f=>f.category));return true;}}catch(e){}return false;}
 
-function render() {
-  var container = document.getElementById('filesList');
-  if(!container) return;
-  container.innerHTML = '';
-  
-  if(files.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';
-    updateInfo();
-    return;
-  }
-  
-  categories = new Set(files.map(f => f.category));
-  updateCatList();
-  
-  var catArr = Array.from(categories).sort();
-  for(var ci=0; ci<catArr.length; ci++) {
-    var cat = catArr[ci];
-    var catFiles = files.filter(f => f.category === cat);
-    if(catFiles.length === 0) continue;
-    
-    var box = document.createElement('div');
-    box.className = 'category-box';
-    
-    var header = document.createElement('div');
-    header.className = 'category-header';
-    var isOpen = openStates[cat] !== false;
-    
-    var arrow = document.createElement('span');
-    arrow.className = 'arrow' + (isOpen ? '' : ' collapsed');
-    arrow.textContent = '▼';
-    
-    var title = document.createElement('h2');
-    title.textContent = cat;
-    title.onclick = function(e){ e.stopPropagation(); editCatName(this, cat); };
-    
-    var count = document.createElement('span');
-    count.className = 'count';
-    count.textContent = catFiles.length + ' فایل';
-    
-    var actions = document.createElement('div');
-    actions.className = 'cat-actions';
-    
-    var pBtn = document.createElement('button');
-    pBtn.textContent = '🖨️';
-    pBtn.title = 'پرینت دسته';
-    pBtn.onclick = function(e){ e.stopPropagation(); printCategory(cat); };
-    
-    var cBtn = document.createElement('button');
-    cBtn.textContent = '📋';
-    cBtn.title = 'کپی محتوای دسته';
-    cBtn.onclick = function(e){ e.stopPropagation(); copyCategory(cat); };
-    
-    var dBtn = document.createElement('button');
-    dBtn.className = 'danger';
-    dBtn.textContent = '🗑️';
-    dBtn.title = 'حذف دسته';
-    dBtn.onclick = function(e){ e.stopPropagation(); deleteCategory(cat); };
-    
-    actions.appendChild(pBtn);
-    actions.appendChild(cBtn);
-    actions.appendChild(dBtn);
-    
-    header.appendChild(arrow);
-    header.appendChild(title);
-    header.appendChild(count);
-    header.appendChild(actions);
-    
-    var filesContainer = document.createElement('div');
-    filesContainer.className = 'files-container';
-    filesContainer.style.display = isOpen ? 'block' : 'none';
-    
-    header.onclick = function() {
-      var vis = filesContainer.style.display === 'block';
-      filesContainer.style.display = vis ? 'none' : 'block';
-      arrow.classList.toggle('collapsed', vis);
-      openStates[cat] = !vis;
-      saveToDB();
-    };
-    
-    box.appendChild(header);
-    box.appendChild(filesContainer);
-    
-    var sorted = catFiles.sort(function(a,b){ return a.name.localeCompare(b.name); });
-    for(var fi=0; fi<sorted.length; fi++) {
-      var file = sorted[fi];
-      var item = document.createElement('div');
-      item.className = 'file-item';
-      
-      var fh = document.createElement('div');
-      fh.className = 'file-header';
-      
-      var farrow = document.createElement('span');
-      farrow.className = 'arrow';
-      farrow.textContent = '▶';
-      
-      var fn = document.createElement('span');
-      fn.className = 'fname';
-      fn.textContent = file.name;
-      fn.onclick = function(e){ e.stopPropagation(); editFileName(this, file); };
-      
-      var fa = document.createElement('div');
-      fa.className = 'file-actions';
-      
-      var copyFileBtn = document.createElement('button');
-      copyFileBtn.textContent = '📋';
-      copyFileBtn.title = 'کپی محتوا';
-      copyFileBtn.onclick = function(e){ 
-        e.stopPropagation(); 
-        navigator.clipboard.writeText(file.content).then(function(){ toast('✅ کپی شد','success'); }).catch(function(){ toast('❌ خطا','error'); }); 
-      };
-      
-      var printFileBtn = document.createElement('button');
-      printFileBtn.className = 'success';
-      printFileBtn.textContent = '🖨️';
-      printFileBtn.title = 'پرینت فایل';
-      printFileBtn.onclick = function(e){ e.stopPropagation(); printFile(file); };
-      
-      var deleteFileBtn = document.createElement('button');
-      deleteFileBtn.className = 'danger';
-      deleteFileBtn.textContent = '🗑️';
-      deleteFileBtn.title = 'حذف فایل';
-      deleteFileBtn.onclick = function(e){ e.stopPropagation(); deleteFile(file.id); };
-      
-      fa.appendChild(copyFileBtn);
-      fa.appendChild(printFileBtn);
-      fa.appendChild(deleteFileBtn);
-      
-      fh.appendChild(farrow);
-      fh.appendChild(fn);
-      fh.appendChild(fa);
-      
-      var fc = document.createElement('div');
-      fc.className = 'file-content';
-      fc.style.display = 'none';
-      
-      var ta = document.createElement('textarea');
-      ta.value = file.content;
-      ta.oninput = function() {
-        var idx = files.findIndex(f=> f.id === file.id);
-        if(idx > -1) files[idx].content = this.value;
-        searchDo();
-        saveToDB();
-      };
-      
-      var ca = document.createElement('div');
-      ca.className = 'content-actions';
-      
-      var saveBtn = document.createElement('button');
-      saveBtn.textContent = '💾 ذخیره';
-      saveBtn.onclick = function(e){ e.stopPropagation(); saveToDB(); toast('✅ ذخیره شد','success'); };
-      
-      var dlBtn = document.createElement('button');
-      dlBtn.textContent = '⬇️ دانلود';
-      dlBtn.onclick = function(e){ e.stopPropagation(); download(file.name, file.content, 'text/plain'); };
-      
-      ca.appendChild(saveBtn);
-      ca.appendChild(dlBtn);
-      
-      fc.appendChild(ta);
-      fc.appendChild(ca);
-      
-      item.appendChild(fh);
-      item.appendChild(fc);
-      
-      fh.onclick = function() {
-        var vis = fc.style.display === 'block';
-        fc.style.display = vis ? 'none' : 'block';
-        farrow.classList.toggle('open', !vis);
-        farrow.textContent = vis ? '▶' : '▼';
-      };
-      
-      filesContainer.appendChild(item);
-    }
-    
-    container.appendChild(box);
-  }
-  
-  updateInfo();
-}
+function render(){var container=document.getElementById('filesList');if(!container)return;container.innerHTML='';if(files.length===0){container.innerHTML='<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';updateInfo();return;}categories=new Set(files.map(f=>f.category));updateCatList();var catArr=Array.from(categories).sort();for(var ci=0;ci<catArr.length;ci++){var cat=catArr[ci];var catFiles=files.filter(f=>f.category===cat);if(catFiles.length===0)continue;var box=document.createElement('div');box.className='category-box';var header=document.createElement('div');header.className='category-header';var isOpen=openStates[cat]!==false;var arrow=document.createElement('span');arrow.className='arrow'+(isOpen?'':' collapsed');arrow.textContent='▼';var title=document.createElement('h2');title.textContent=cat;title.onclick=function(e){e.stopPropagation();editCatName(this,cat);};var count=document.createElement('span');count.className='count';count.textContent=catFiles.length+' فایل';var actions=document.createElement('div');actions.className='cat-actions';var pBtn=document.createElement('button');pBtn.textContent='🖨️';pBtn.title='پرینت دسته';pBtn.onclick=function(e){e.stopPropagation();printCategory(cat);};var cBtn=document.createElement('button');cBtn.textContent='📋';cBtn.title='کپی محتوای دسته';cBtn.onclick=function(e){e.stopPropagation();copyCategory(cat);};var dBtn=document.createElement('button');dBtn.className='danger';dBtn.textContent='🗑️';dBtn.title='حذف دسته';dBtn.onclick=function(e){e.stopPropagation();deleteCategory(cat);};actions.appendChild(pBtn);actions.appendChild(cBtn);actions.appendChild(dBtn);header.appendChild(arrow);header.appendChild(title);header.appendChild(count);header.appendChild(actions);var filesContainer=document.createElement('div');filesContainer.className='files-container';filesContainer.style.display=isOpen?'block':'none';header.onclick=function(){var vis=filesContainer.style.display==='block';filesContainer.style.display=vis?'none':'block';arrow.classList.toggle('collapsed',vis);openStates[cat]=!vis;saveToDB();};box.appendChild(header);box.appendChild(filesContainer);var sorted=catFiles.sort(function(a,b){return a.name.localeCompare(b.name);});for(var fi=0;fi<sorted.length;fi++){var file=sorted[fi];var item=document.createElement('div');item.className='file-item';var fh=document.createElement('div');fh.className='file-header';var farrow=document.createElement('span');farrow.className='arrow';farrow.textContent='▶';var fn=document.createElement('span');fn.className='fname';fn.textContent=file.name;fn.onclick=function(e){e.stopPropagation();editFileName(this,file);};var fa=document.createElement('div');fa.className='file-actions';var copyFileBtn=document.createElement('button');copyFileBtn.textContent='📋';copyFileBtn.title='کپی محتوا';copyFileBtn.onclick=function(e){e.stopPropagation();navigator.clipboard.writeText(file.content).then(function(){toast('✅ کپی شد','success');}).catch(function(){toast('❌ خطا','error');});};var printFileBtn=document.createElement('button');printFileBtn.className='success';printFileBtn.textContent='🖨️';printFileBtn.title='پرینت فایل';printFileBtn.onclick=function(e){e.stopPropagation();printFile(file);};var deleteFileBtn=document.createElement('button');deleteFileBtn.className='danger';deleteFileBtn.textContent='🗑️';deleteFileBtn.title='حذف فایل';deleteFileBtn.onclick=function(e){e.stopPropagation();deleteFile(file.id);};fa.appendChild(copyFileBtn);fa.appendChild(printFileBtn);fa.appendChild(deleteFileBtn);fh.appendChild(farrow);fh.appendChild(fn);fh.appendChild(fa);var fc=document.createElement('div');fc.className='file-content';fc.style.display='none';var ta=document.createElement('textarea');ta.value=file.content;ta.oninput=function(){var idx=files.findIndex(f=>f.id===file.id);if(idx>-1)files[idx].content=this.value;searchDo();saveToDB();};var ca=document.createElement('div');ca.className='content-actions';var saveBtn=document.createElement('button');saveBtn.textContent='💾 ذخیره';saveBtn.onclick=function(e){e.stopPropagation();saveToDB();toast('✅ ذخیره شد','success');};var dlBtn=document.createElement('button');dlBtn.textContent='⬇️ دانلود';dlBtn.onclick=function(e){e.stopPropagation();download(file.name,file.content,'text/plain');};ca.appendChild(saveBtn);ca.appendChild(dlBtn);fc.appendChild(ta);fc.appendChild(ca);item.appendChild(fh);item.appendChild(fc);fh.onclick=function(){var vis=fc.style.display==='block';fc.style.display=vis?'none':'block';farrow.classList.toggle('open',!vis);farrow.textContent=vis?'▶':'▼';};filesContainer.appendChild(item);}container.appendChild(box);}updateInfo();}
 
-function editCatName(el, old) {
-  var input = document.createElement('input');
-  input.type = 'text';
-  input.value = old;
-  input.className = 'inline-edit';
-  el.replaceWith(input);
-  input.focus();
-  input.select();
-  var cancelled = false;
-  
-  function done() {
-    if(cancelled) return;
-    var val = input.value.trim();
-    if(!val) { toast('نام نمی‌تواند خالی باشد','warning'); input.focus(); return; }
-    if(val === old) { input.replaceWith(el); return; }
-    if(categories.has(val)) { toast('نام تکراری است','warning'); input.focus(); return; }
-    categories.delete(old);
-    categories.add(val);
-    for(var i=0; i<files.length; i++) { if(files[i].category === old) files[i].category = val; }
-    render(); searchDo(); saveToDB();
-    toast('✅ نام تغییر کرد','success');
-  }
-  
-  input.addEventListener('blur', done);
-  input.addEventListener('keydown', function(e) {
-    if(e.key === 'Enter') { e.preventDefault(); this.blur(); }
-    else if(e.key === 'Escape') { cancelled = true; this.replaceWith(el); }
-  });
-}
+function editCatName(el,old){var input=document.createElement('input');input.type='text';input.value=old;input.className='inline-edit';el.replaceWith(input);input.focus();input.select();var cancelled=false;function done(){if(cancelled)return;var val=input.value.trim();if(!val){toast('نام نمی‌تواند خالی باشد','warning');input.focus();return;}if(val===old){input.replaceWith(el);return;}if(categories.has(val)){toast('نام تکراری است','warning');input.focus();return;}categories.delete(old);categories.add(val);for(var i=0;i<files.length;i++){if(files[i].category===old)files[i].category=val;}render();searchDo();saveToDB();toast('✅ نام تغییر کرد','success');}input.addEventListener('blur',done);input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur();}else if(e.key==='Escape'){cancelled=true;this.replaceWith(el);}});}
 
-function editFileName(el, file) {
-  var input = document.createElement('input');
-  input.type = 'text';
-  input.value = file.name;
-  input.className = 'inline-edit';
-  input.style.maxWidth = '200px';
-  el.replaceWith(input);
-  input.focus();
-  input.select();
-  var cancelled = false;
-  
-  function done() {
-    if(cancelled) return;
-    var val = input.value.trim();
-    if(!val) { toast('نام نمی‌تواند خالی باشد','warning'); input.focus(); return; }
-    if(val === file.name) { input.replaceWith(el); return; }
-    if(files.some(f=> f.category === file.category && f.name === val && f.id !== file.id)) {
-      toast('نام تکراری است','warning'); input.focus(); return;
-    }
-    file.name = val;
-    render(); searchDo(); saveToDB();
-    toast('✅ نام تغییر کرد','success');
-  }
-  
-  input.addEventListener('blur', done);
-  input.addEventListener('keydown', function(e) {
-    if(e.key === 'Enter') { e.preventDefault(); this.blur(); }
-    else if(e.key === 'Escape') { cancelled = true; this.replaceWith(el); }
-  });
-}
+function editFileName(el,file){var input=document.createElement('input');input.type='text';input.value=file.name;input.className='inline-edit';input.style.maxWidth='200px';el.replaceWith(input);input.focus();input.select();var cancelled=false;function done(){if(cancelled)return;var val=input.value.trim();if(!val){toast('نام نمی‌تواند خالی باشد','warning');input.focus();return;}if(val===file.name){input.replaceWith(el);return;}if(files.some(f=>f.category===file.category&&f.name===val&&f.id!==file.id)){toast('نام تکراری است','warning');input.focus();return;}file.name=val;render();searchDo();saveToDB();toast('✅ نام تغییر کرد','success');}input.addEventListener('blur',done);input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur();}else if(e.key==='Escape'){cancelled=true;this.replaceWith(el);}});}
 
-function deleteFile(id) {
-  var file = files.find(f=> f.id === id);
-  if(!file) return;
-  undoData = { action: 'file', file: JSON.parse(JSON.stringify(file)), cat: file.category };
-  document.getElementById('undoBtn').disabled = false;
-  files = files.filter(f=> f.id !== id);
-  render(); searchDo(); saveToDB();
-  toast('🗑️ "' + file.name + '" حذف شد','warning');
-}
+function deleteFile(id){var file=files.find(f=>f.id===id);if(!file)return;undoData={action:'file',file:JSON.parse(JSON.stringify(file)),cat:file.category};document.getElementById('undoBtn').disabled=false;files=files.filter(f=>f.id!==id);render();searchDo();saveToDB();toast('🗑️ "'+file.name+'" حذف شد','warning');}
 
-function deleteCategory(cat) {
-  var count = files.filter(f=> f.category === cat).length;
-  if(count === 0) return;
-  if(!confirm('آیا دسته "' + cat + '" و ' + count + ' فایل آن حذف شود؟')) return;
-  var deleted = files.filter(f=> f.category === cat).map(f=> JSON.parse(JSON.stringify(f)));
-  undoData = { action: 'cat', cat: cat, files: deleted };
-  document.getElementById('undoBtn').disabled = false;
-  files = files.filter(f=> f.category !== cat);
-  categories.delete(cat);
-  render(); searchDo(); saveToDB();
-  toast('🗑️ دسته "' + cat + '" حذف شد','warning');
-}
+function deleteCategory(cat){var count=files.filter(f=>f.category===cat).length;if(count===0)return;if(!confirm('آیا دسته "'+cat+'" و '+count+' فایل آن حذف شود؟'))return;var deleted=files.filter(f=>f.category===cat).map(f=>JSON.parse(JSON.stringify(f)));undoData={action:'cat',cat:cat,files:deleted};document.getElementById('undoBtn').disabled=false;files=files.filter(f=>f.category!==cat);categories.delete(cat);render();searchDo();saveToDB();toast('🗑️ دسته "'+cat+'" حذف شد','warning');}
 
-function undo() {
-  if(!undoData) return;
-  if(undoData.action === 'file') {
-    files.push({ id: idCounter++, name: undoData.file.name, content: undoData.file.content, category: undoData.cat });
-    categories.add(undoData.cat);
-    toast('↩️ فایل بازگردانی شد','success');
-  } else if(undoData.action === 'cat') {
-    for(var i=0; i<undoData.files.length; i++) {
-      files.push({ id: idCounter++, name: undoData.files[i].name, content: undoData.files[i].content, category: undoData.cat });
-    }
-    categories.add(undoData.cat);
-    toast('↩️ دسته "' + undoData.cat + '" بازگردانی شد','success');
-  }
-  undoData = null;
-  document.getElementById('undoBtn').disabled = true;
-  render(); searchDo(); saveToDB();
-}
+function undo(){if(!undoData)return;if(undoData.action==='file'){files.push({id:idCounter++,name:undoData.file.name,content:undoData.file.content,category:undoData.cat});categories.add(undoData.cat);toast('↩️ فایل بازگردانی شد','success');}else if(undoData.action==='cat'){for(var i=0;i<undoData.files.length;i++){files.push({id:idCounter++,name:undoData.files[i].name,content:undoData.files[i].content,category:undoData.cat});}categories.add(undoData.cat);toast('↩️ دسته "'+undoData.cat+'" بازگردانی شد','success');}undoData=null;document.getElementById('undoBtn').disabled=true;render();searchDo();saveToDB();}
 
-function clearAll() {
-  if(files.length === 0) { toast('چیزی برای پاک کردن نیست','warning'); return; }
-  if(!confirm('همه فایل‌ها پاک شوند؟')) return;
-  undoData = { action: 'cat', cat: 'همه', files: files.map(f=> JSON.parse(JSON.stringify(f))) };
-  document.getElementById('undoBtn').disabled = false;
-  files = []; categories.clear();
-  render(); searchDo(); saveToDB();
-  toast('🗑️ همه پاک شدند','warning');
-}
+function clearAll(){if(files.length===0){toast('چیزی برای پاک کردن نیست','warning');return;}if(!confirm('همه فایل‌ها پاک شوند؟'))return;undoData={action:'cat',cat:'همه',files:files.map(f=>JSON.parse(JSON.stringify(f)))};document.getElementById('undoBtn').disabled=false;files=[];categories.clear();render();searchDo();saveToDB();toast('🗑️ همه پاک شدند','warning');}
 
-function printFile(file) {
-  try {
-    var win = window.open('', '_blank', 'width=800,height=600');
-    if(!win) { toast('❌ پنجره مسدود شده','error'); return; }
-    var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + escapeHtml(file.name) + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 ' + escapeHtml(file.name) + '</h1><pre>' + escapeHtml(file.content) + '</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';
-    win.document.write(html);
-    win.document.close();
-  } catch(e) { toast('❌ خطا در پرینت','error'); }
-}
+function printFile(file){try{var win=window.open('','_blank','width=800,height=600');if(!win){toast('❌ پنجره مسدود شده','error');return;}var html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+escapeHtml(file.name)+'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 '+escapeHtml(file.name)+'</h1><pre>'+escapeHtml(file.content)+'</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';win.document.write(html);win.document.close();}catch(e){toast('❌ خطا در پرینت','error');}}
 
-function printCategory(cat) {
-  try {
-    var catFiles = files.filter(f=> f.category === cat);
-    if(catFiles.length === 0) { toast('فایلی نیست','warning'); return; }
-    var win = window.open('', '_blank', 'width=900,height=700');
-    if(!win) { toast('❌ پنجره مسدود شده','error'); return; }
-    var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + escapeHtml(cat) + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5;color:#333}.item{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px}.fname{font-weight:700;color:#2c3e50}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📁 ' + escapeHtml(cat) + ' (' + catFiles.length + ' فایل)</h1>';
-    for(var i=0; i<catFiles.length; i++) {
-      html += '<div class="item"><div class="fname">📄 ' + escapeHtml(catFiles[i].name) + '</div><pre>' + escapeHtml(catFiles[i].content) + '</pre></div>';
-    }
-    html += '<script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';
-    win.document.write(html);
-    win.document.close();
-  } catch(e) { toast('❌ خطا در پرینت','error'); }
-}
+function printCategory(cat){try{var catFiles=files.filter(f=>f.category===cat);if(catFiles.length===0){toast('فایلی نیست','warning');return;}var win=window.open('','_blank','width=900,height=700');if(!win){toast('❌ پنجره مسدود شده','error');return;}var html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+escapeHtml(cat)+'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5;color:#333}.item{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px}.fname{font-weight:700;color:#2c3e50}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📁 '+escapeHtml(cat)+' ('+catFiles.length+' فایل)</h1>';for(var i=0;i<catFiles.length;i++){html+='<div class="item"><div class="fname">📄 '+escapeHtml(catFiles[i].name)+'</div><pre>'+escapeHtml(catFiles[i].content)+'</pre></div>';}html+='<script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';win.document.write(html);win.document.close();}catch(e){toast('❌ خطا در پرینت','error');}}
 
-function copyCategory(cat) {
-  var catFiles = files.filter(f=> f.category === cat);
-  if(catFiles.length === 0) { toast('فایلی نیست','warning'); return; }
-  var text = '';
-  for(var i=0; i<catFiles.length; i++) {
-    text += '===== ' + catFiles[i].name + ' =====\n' + catFiles[i].content + '\n\n';
-  }
-  navigator.clipboard.writeText(text).then(function(){ toast('✅ محتوای ' + catFiles.length + ' فایل کپی شد','success'); }).catch(function(){ toast('❌ خطا در کپی','error'); });
-}
+function copyCategory(cat){var catFiles=files.filter(f=>f.category===cat);if(catFiles.length===0){toast('فایلی نیست','warning');return;}var text='';for(var i=0;i<catFiles.length;i++){text+='===== '+catFiles[i].name+' =====\n'+catFiles[i].content+'\n\n';}navigator.clipboard.writeText(text).then(function(){toast('✅ محتوای '+catFiles.length+' فایل کپی شد','success');}).catch(function(){toast('❌ خطا در کپی','error');});}
 
-function searchDo() {
-  var input = document.getElementById('searchInput');
-  var resultsDiv = document.getElementById('searchResults');
-  var actions = document.getElementById('searchActions');
-  var stats = document.getElementById('searchStats');
-  var notice = document.getElementById('searchNotice');
-  if(!input || !resultsDiv) return;
-  
-  var q = input.value.trim();
-  resultsDiv.innerHTML = '';
-  searchResults = [];
-  if(actions) actions.classList.remove('show');
-  if(notice) notice.classList.remove('show');
-  
-  if(!q) {
-    resultsDiv.innerHTML = '<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';
-    return;
-  }
-  
-  var results = [];
-  var lower = q.toLowerCase();
-  for(var i=0; i<files.length; i++) {
-    var f = files[i];
-    if(f.content.toLowerCase().includes(lower)) {
-      var lines = f.content.split('\n');
-      for(var j=0; j<lines.length; j++) {
-        if(lines[j].toLowerCase().includes(lower)) {
-          results.push({ id: f.id, name: f.name, cat: f.category, line: j+1, text: lines[j] });
-        }
-      }
-    }
-  }
-  
-  if(results.length === 0) {
-    resultsDiv.innerHTML = '<p style="color:#888">🔍 نتیجه‌ای یافت نشد.</p>';
-    return;
-  }
-  
-  var countDiv = document.createElement('div');
-  countDiv.style.cssText = 'font-weight:700;margin-bottom:8px;color:var(--primary-light)';
-  countDiv.textContent = '✅ ' + results.length + ' نتیجه';
-  resultsDiv.appendChild(countDiv);
-  
-  var maxShow = Math.min(50, results.length);
-  for(var k=0; k<maxShow; k++) {
-    var r = results[k];
-    var escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    var regex = new RegExp(escapedQ, 'gi');
-    var highlighted = escapeHtml(r.text).replace(regex, function(m){ return '<mark>' + m + '</mark>'; });
-    var div = document.createElement('div');
-    div.innerHTML = '<b>📄</b> ' + escapeHtml(r.name) + ' | <b>📁</b> ' + escapeHtml(r.cat) + ' | <b>🔢</b> خط ' + r.line + '<br>' + highlighted;
-    resultsDiv.appendChild(div);
-  }
-  
-  if(results.length > maxShow) {
-    var more = document.createElement('div');
-    more.style.cssText = 'color:#888;font-style:italic';
-    more.textContent = '... و ' + (results.length - maxShow) + ' نتیجه دیگر';
-    resultsDiv.appendChild(more);
-  }
-  
-  searchResults = results;
-  
-  if(actions) {
-    actions.classList.add('show');
-    if(stats) stats.textContent = '📊 ' + results.length + ' نتیجه';
-  }
-  if(notice) {
-    notice.textContent = '🔍 ' + results.length + ' نتیجه برای "' + q + '" یافت شد.';
-    notice.classList.add('show');
-  }
-}
+function searchDo(){var input=document.getElementById('searchInput');var resultsDiv=document.getElementById('searchResults');var actions=document.getElementById('searchActions');var stats=document.getElementById('searchStats');var notice=document.getElementById('searchNotice');if(!input||!resultsDiv)return;var q=input.value.trim();resultsDiv.innerHTML='';searchResults=[];if(actions)actions.classList.remove('show');if(notice)notice.classList.remove('show');if(!q){resultsDiv.innerHTML='<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';return;}var results=[];var lower=q.toLowerCase();for(var i=0;i<files.length;i++){var f=files[i];if(f.content.toLowerCase().includes(lower)){var lines=f.content.split('\n');for(var j=0;j<lines.length;j++){if(lines[j].toLowerCase().includes(lower)){results.push({id:f.id,name:f.name,cat:f.category,line:j+1,text:lines[j]});}}}}if(results.length===0){resultsDiv.innerHTML='<p style="color:#888">🔍 نتیجه‌ای یافت نشد.</p>';return;}var countDiv=document.createElement('div');countDiv.style.cssText='font-weight:700;margin-bottom:8px;color:var(--primary-light)';countDiv.textContent='✅ '+results.length+' نتیجه';resultsDiv.appendChild(countDiv);var maxShow=Math.min(50,results.length);for(var k=0;k<maxShow;k++){var r=results[k];var escapedQ=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');var regex=new RegExp(escapedQ,'gi');var highlighted=escapeHtml(r.text).replace(regex,function(m){return '<mark>'+m+'</mark>';});var div=document.createElement('div');div.innerHTML='<b>📄</b> '+escapeHtml(r.name)+' | <b>📁</b> '+escapeHtml(r.cat)+' | <b>🔢</b> خط '+r.line+'<br>'+highlighted;resultsDiv.appendChild(div);}if(results.length>maxShow){var more=document.createElement('div');more.style.cssText='color:#888;font-style:italic';more.textContent='... و '+(results.length-maxShow)+' نتیجه دیگر';resultsDiv.appendChild(more);}searchResults=results;if(actions){actions.classList.add('show');if(stats)stats.textContent='📊 '+results.length+' نتیجه';}if(notice){notice.textContent='🔍 '+results.length+' نتیجه برای "'+q+'" یافت شد.';notice.classList.add('show');}}
 
-function saveSearchResults() {
-  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
-  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
-  var date = new Date().toLocaleDateString('fa-IR');
-  var text = '📋 گزارش نتایج جستجو\n═══════════════════════════════════════\n🗓 تاریخ: ' + date + '\n🔍 عبارت: "' + q + '"\n📊 تعداد: ' + searchResults.length + '\n═══════════════════════════════════════\n\n';
-  var grouped = {};
-  for(var i=0; i<searchResults.length; i++) {
-    var key = searchResults[i].cat + ' › ' + searchResults[i].name;
-    if(!grouped[key]) grouped[key] = [];
-    grouped[key].push(searchResults[i]);
-  }
-  var keys = Object.keys(grouped);
-  for(var j=0; j<keys.length; j++) {
-    text += '📁 ' + keys[j] + '\n───────────────────────\n';
-    for(var k=0; k<grouped[keys[j]].length; k++) {
-      text += '  خط ' + grouped[keys[j]][k].line + ': "' + grouped[keys[j]][k].text.trim() + '"\n\n';
-    }
-  }
-  text += '═══════════════════════════════════════\n';
-  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
-  download('نتایج_جستجو_' + safeQ + '.txt', text, 'text/plain');
-  toast('✅ نتایج جستجو ذخیره شد','success');
-}
+function printSearchResults(){if(!searchResults||searchResults.length===0){toast('❌ نتیجه‌ای نیست','error');return;}var q=document.getElementById('searchInput').value.trim()||'جستجو';var date=new Date().toLocaleDateString('fa-IR');try{var win=window.open('','_blank','width=900,height=700');if(!win){toast('❌ پنجره مسدود شده','error');return;}var html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>نتایج جستجو</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333;background:#f5f5f5}h1{color:#1565c0;text-align:center;margin-bottom:5px}.header-info{text-align:center;margin:20px 0;padding:10px;background:#e8f4fd;border-radius:8px}.result-item{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;border-right:4px solid #3498db;box-shadow:0 0 5px rgba(0,0,0,0.1)}.file-info{font-weight:700;color:#2c3e50;margin-bottom:8px;font-size:14px}.file-text{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word;margin-top:5px;font-size:13px;line-height:1.6}mark{background:#fff59d;color:#7b6f00;padding:0 3px;border-radius:3px}</style></head><body>';html+='<h1>📋 نتایج جستجو</h1><div class="header-info"><p><strong>🔍 عبارت:</strong> "'+escapeHtml(q)+'" | <strong>📊 تعداد:</strong> '+searchResults.length+' نتیجه | <strong>📅 تاریخ:</strong> '+date+'</p></div><hr style="margin:20px 0;border:1px solid #ddd">';for(var i=0;i<searchResults.length;i++){var r=searchResults[i];var escapedQ=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');var regex=new RegExp(escapedQ,'gi');var highlighted=escapeHtml(r.text).replace(regex,function(m){return '<mark>'+m+'</mark>';});html+='<div class="result-item"><div class="file-info">📄 '+escapeHtml(r.name)+' | 📁 '+escapeHtml(r.cat)+' | 🔢 خط '+r.line+'</div><div class="file-text">'+highlighted+'</div></div>';}html+='<div style="text-align:center;margin-top:30px;padding:15px;color:#888;font-size:12px;border-top:1px solid #ddd">📄 ساخته شده با Text2Html v5</div>';html+='<script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';win.document.write(html);win.document.close();}catch(e){toast('❌ خطا در پرینت','error');}}
 
-function saveSearchTexts() {
-  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
-  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
-  var date = new Date().toLocaleDateString('fa-IR');
-  var text = '📄 متن‌های حاوی "' + q + '"\n═══════════════════════════════════════\n🗓 تاریخ: ' + date + '\n📊 تعداد: ' + searchResults.length + '\n═══════════════════════════════════════\n\n';
-  for(var i=0; i<searchResults.length; i++) {
-    text += '[' + (i+1) + '] ' + searchResults[i].cat + ' › ' + searchResults[i].name + ' (خط ' + searchResults[i].line + '):\n    ' + searchResults[i].text.trim() + '\n\n';
-  }
-  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
-  download('متن‌های_شامل_' + safeQ + '.txt', text, 'text/plain');
-  toast('✅ متن‌ها ذخیره شد','success');
-}
+function saveSearchResults(){if(!searchResults||searchResults.length===0){toast('❌ نتیجه‌ای نیست','error');return;}var q=document.getElementById('searchInput').value.trim()||'جستجو';var date=new Date().toLocaleDateString('fa-IR');var text='📋 گزارش نتایج جستجو\n═══════════════════════════════════════\n🗓 تاریخ: '+date+'\n🔍 عبارت: "'+q+'"\n📊 تعداد: '+searchResults.length+'\n═══════════════════════════════════════\n\n';var grouped={};for(var i=0;i<searchResults.length;i++){var key=searchResults[i].cat+' › '+searchResults[i].name;if(!grouped[key])grouped[key]=[];grouped[key].push(searchResults[i]);}var keys=Object.keys(grouped);for(var j=0;j<keys.length;j++){text+='📁 '+keys[j]+'\n───────────────────────\n';for(var k=0;k<grouped[keys[j]].length;k++){text+='  خط '+grouped[keys[j]][k].line+': "'+grouped[keys[j]][k].text.trim()+'"\n\n';}}text+='═══════════════════════════════════════\n';var safeQ=q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g,'_').substring(0,50);download('نتایج_جستجو_'+safeQ+'.txt',text,'text/plain');toast('✅ نتایج جستجو ذخیره شد','success');}
 
-function saveSearchJson() {
-  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
-  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
-  var data = { exportDate: new Date().toISOString(), query: q, total: searchResults.length, results: searchResults.map(r => ({ fileId: r.id, fileName: r.name, category: r.cat, line: r.line, text: r.text })) };
-  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
-  download('نتایج_جستجو_' + safeQ + '.json', JSON.stringify(data, null, 2), 'application/json');
-  toast('✅ JSON ذخیره شد','success');
-}
+function saveSearchTexts(){if(!searchResults||searchResults.length===0){toast('❌ نتیجه‌ای نیست','error');return;}var q=document.getElementById('searchInput').value.trim()||'جستجو';var date=new Date().toLocaleDateString('fa-IR');var text='📄 متن‌های حاوی "'+q+'"\n═══════════════════════════════════════\n🗓 تاریخ: '+date+'\n📊 تعداد: '+searchResults.length+'\n═══════════════════════════════════════\n\n';for(var i=0;i<searchResults.length;i++){text+='['+(i+1)+'] '+searchResults[i].cat+' › '+searchResults[i].name+' (خط '+searchResults[i].line+'):\n    '+searchResults[i].text.trim()+'\n\n';}var safeQ=q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g,'_').substring(0,50);download('متن‌های_شامل_'+safeQ+'.txt',text,'text/plain');toast('✅ متن‌ها ذخیره شد','success');}
 
-function addFiles(fileList, targetCategory) {
-  if(files.length + fileList.length > MAX_FILES) { toast('❌ حداکثر ' + MAX_FILES + ' فایل','error'); return; }
-  var cat = targetCategory || document.getElementById('catInput').value.trim();
-  if(!cat) cat = 'دسته‌بندی نشده';
-  categories.add(cat);
-  var done = 0, total = fileList.length, errors = 0;
-  var progressBar = document.getElementById('progressBar');
-  var progressFill = document.getElementById('progressFill');
-  if(progressBar) progressBar.style.display = 'block';
-  
-  function updateProgress() {
-    var pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    if(progressFill) progressFill.style.width = pct + '%';
-    if(done === total) {
-      setTimeout(function(){ if(progressBar) progressBar.style.display = 'none'; }, 1000);
-      updateCatList();
-      render();
-      document.getElementById('fileInput').value = '';
-      searchDo();
-      saveToDB();
-      if(total - errors > 0) toast('✅ ' + (total - errors) + ' فایل اضافه شد','success');
-      if(errors > 0) toast('⚠️ ' + errors + ' فایل خطا داشت','warning');
-    }
-  }
-  
-  for(var i=0; i<fileList.length; i++) {
-    var file = fileList[i];
-    var ext = file.name.split('.').pop().toLowerCase();
-    if(ACCEPTED.indexOf(ext) === -1) { errors++; done++; updateProgress(); continue; }
-    if(file.size > MAX_SIZE) { errors++; done++; updateProgress(); continue; }
-    (function(f) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        files.push({ id: idCounter++, name: f.name, content: e.target.result, category: cat });
-        done++; updateProgress();
-      };
-      reader.onerror = function() { errors++; done++; updateProgress(); };
-      reader.readAsText(f);
-    })(file);
-  }
-}
+function saveSearchJson(){if(!searchResults||searchResults.length===0){toast('❌ نتیجه‌ای نیست','error');return;}var q=document.getElementById('searchInput').value.trim()||'جستجو';var data={exportDate:new Date().toISOString(),query:q,total:searchResults.length,results:searchResults.map(r=>({fileId:r.id,fileName:r.name,category:r.cat,line:r.line,text:r.text}))};var safeQ=q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g,'_').substring(0,50);download('نتایج_جستجو_'+safeQ+'.json',JSON.stringify(data,null,2),'application/json');toast('✅ JSON ذخیره شد','success');}
+
+function addFiles(fileList,targetCategory){if(files.length+fileList.length>MAX_FILES){toast('❌ حداکثر '+MAX_FILES+' فایل','error');return;}var cat=targetCategory||document.getElementById('catInput').value.trim();if(!cat)cat='دسته‌بندی نشده';categories.add(cat);var done=0,total=fileList.length,errors=0;var progressBar=document.getElementById('progressBar');var progressFill=document.getElementById('progressFill');if(progressBar)progressBar.style.display='block';function updateProgress(){var pct=total>0?Math.round((done/total)*100):0;if(progressFill)progressFill.style.width=pct+'%';if(done===total){setTimeout(function(){if(progressBar)progressBar.style.display='none';},1000);updateCatList();render();document.getElementById('fileInput').value='';searchDo();saveToDB();if(total-errors>0)toast('✅ '+(total-errors)+' فایل اضافه شد','success');if(errors>0)toast('⚠️ '+errors+' فایل خطا داشت','warning');}}for(var i=0;i<fileList.length;i++){var file=fileList[i];var ext=file.name.split('.').pop().toLowerCase();if(ACCEPTED.indexOf(ext)===-1){errors++;done++;updateProgress();continue;}if(file.size>MAX_SIZE){errors++;done++;updateProgress();continue;}(function(f){var reader=new FileReader();reader.onload=function(e){files.push({id:idCounter++,name:f.name,content:e.target.result,category:cat});done++;updateProgress();};reader.onerror=function(){errors++;done++;updateProgress();};reader.readAsText(f);})(file);}}
 
 // ============================================================
-// بخش exportHtmlBtn با امکانات پیشرفته - نسخه اصلاح شده
+// بخش اصلی: خروجی HTML با قابلیت باز/بسته شدن دسته‌ها و فایل‌ها
 // ============================================================
-document.getElementById('exportHtmlBtn').addEventListener('click', function(){
+document.getElementById('exportHtmlBtn').addEventListener('click', function() {
   if(files.length === 0) { toast('❌ فایلی نیست','error'); return; }
 
-  function escapeHtml(t) {
-    if(!t) return '';
-    return t.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; });
-  }
+  function esc(t) { if(!t) return ''; return t.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; }); }
 
-  var html = '<!DOCTYPE html>\n<html dir="rtl">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>خروجی Text2Html v5</title>\n';
-  html += `<style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl;background:#f5f5f5;color:#333}
-    h1{color:#1565c0;margin-bottom:0.5em;text-align:center}
-    h2{color:#2980b9;margin-top:2em;padding-right:10px;border-right:4px solid #2980b9}
-    .search-box{display:flex;justify-content:center;margin:20px 0;gap:10px;flex-wrap:wrap}
-    .search-box input{width:300px;max-width:90%;padding:10px 14px;border:2px solid #3498db;border-radius:8px;font-size:14px;outline:none}
-    .search-box input:focus{border-color:#1565c0}
-    #searchStats{font-size:14px;color:#666;margin:10px 0;text-align:center;display:block;width:100%}
-    .file-container{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 0 6px rgba(0,0,0,0.1)}
-    .file-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:8px;border-radius:6px;transition:background 0.2s}
-    .file-header:hover{background:#f0f0f0}
-    .file-title{font-weight:700;color:#2c3e50;flex:1;user-select:text;cursor:text;padding:4px 8px;border-radius:4px;transition:background 0.2s}
-    .file-title:hover{background:#e8e8e8}
-    .btn-group{display:flex;gap:5px;flex-wrap:wrap}
-    .btn-group button{padding:5px 10px;border:none;border-radius:5px;cursor:pointer;font-size:12px;transition:all 0.2s;white-space:nowrap}
-    .btn-group button:hover{opacity:0.85}
-    .btn-copy{background:#3498db;color:#fff}
-    .btn-print{background:#27ae60;color:#fff}
-    .btn-delete{background:#e74c3c;color:#fff}
-    .btn-edit{background:#f39c12;color:#333}
-    .content-area{display:none;margin-top:10px}
-    .content-area textarea{width:100%;min-height:150px;padding:10px;border:1px solid #ddd;border-radius:6px;resize:vertical;font-family:monospace;font-size:13px;background:#f9f9f9;outline:none}
-    .content-area textarea:focus{border-color:#3498db;background:#fff}
-    .edit-bar{display:none;justify-content:flex-end;gap:8px;margin-top:8px}
-    .edit-bar button{padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;transition:0.2s}
-    .edit-bar button:hover{opacity:0.85}
-    .save-btn{background:#27ae60;color:#fff}
-    .cancel-btn{background:#e74c3c;color:#fff}
-    @media(max-width:600px){.file-header{flex-direction:column;gap:10px}.btn-group{width:100%;justify-content:center}}
-  </style>\n`;
-  html += '</head>\n<body>\n';
+  var h = '<!DOCTYPE html>\n<html dir="rtl">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>خروجی Text2Html v5 - باز/بسته شدن کامل</title>\n';
+  h += '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl;background:#f5f5f5;color:#333}h1{color:#1565c0;margin-bottom:0.5em;text-align:center}';
+  h += '.cat-section{background:#fff;border-radius:10px;margin-bottom:25px;box-shadow:0 0 8px rgba(0,0,0,0.1);overflow:hidden}';
+  h += '.cat-hdr{background:#e8f4fd;padding:10px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none}';
+  h += '.cat-hdr:hover{background:#d4ecf9}';
+  h += '.cat-arrow{font-size:10px;color:#1565c0;transition:transform .3s;display:inline-block}';
+  h += '.cat-arrow.clps{transform:rotate(-90deg)}';
+  h += '.cat-hdr h2{flex:1;font-size:16px;color:#1565c0}';
+  h += '.cat-hdr .cnt{font-size:12px;color:#666;background:#fff;padding:2px 12px;border-radius:20px}';
+  h += '.cat-hdr .cat-print{font-size:11px;padding:3px 8px;border:1px solid #27ae60;border-radius:4px;background:transparent;color:#27ae60;cursor:pointer}';
+  h += '.cat-hdr .cat-print:hover{background:#27ae60;color:#fff}';
+  h += '.cat-body{padding:12px 18px 18px}';
+  h += '.file-box{background:#f9f9f9;border:1px solid #eee;border-radius:8px;margin-bottom:12px;overflow:hidden}';
+  h += '.file-box:last-child{margin-bottom:0}';
+  h += '.file-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 12px;transition:background .2s}';
+  h += '.file-hdr:hover{background:#f0f0f0}';
+  h += '.file-title{font-weight:700;color:#2c3e50;flex:1;padding:3px 8px;border-radius:4px}';
+  h += '.file-title:hover{background:#e8e8e8}';
+  h += '.btn-grp{display:flex;gap:4px}';
+  h += '.btn-grp button{padding:3px 8px;border:none;border-radius:4px;cursor:pointer;font-size:11px;color:#fff;transition:.2s}';
+  h += '.btn-grp button:hover{opacity:.85}';
+  h += '.btn-copy{background:#3498db}';
+  h += '.btn-print{background:#27ae60}';
+  h += '.btn-del{background:#e74c3c}';
+  h += '.btn-edit{background:#f39c12;color:#333!important}';
+  h += '.cnt-area{display:none;padding:10px 12px 12px;border-top:2px solid #e0e0e0}';
+  h += '.cnt-area textarea{width:100%;min-height:120px;padding:10px;border:1px solid #ddd;border-radius:6px;resize:vertical;font-family:monospace;font-size:12px;background:#fff;outline:none}';
+  h += '.cnt-area textarea:focus{border-color:#3498db}';
+  h += '.edit-bar{display:none;justify-content:flex-end;gap:6px;margin-top:6px}';
+  h += '.edit-bar button{padding:5px 12px;border:none;border-radius:4px;cursor:pointer;font-size:11px;color:#fff}';
+  h += '.edit-bar .sv{background:#27ae60}';
+  h += '.edit-bar .cn{background:#e74c3c}';
+  h += '.search-box{display:flex;justify-content:center;margin:20px 0;gap:10px;flex-wrap:wrap}';
+  h += '.search-box input{width:300px;max-width:90%;padding:10px 14px;border:2px solid #3498db;border-radius:8px;font-size:14px;outline:none}';
+  h += '.search-box input:focus{border-color:#1565c0}';
+  h += '#sStats{font-size:13px;color:#666;text-align:center;display:block;width:100%;margin-top:8px}';
+  h += '.ftr{text-align:center;margin-top:30px;padding:15px;color:#888;font-size:12px;border-top:1px solid #ddd}';
+  h += '@media(max-width:600px){.file-hdr{flex-direction:column;gap:8px;align-items:stretch}.btn-grp{width:100%;justify-content:center}}';
+  h += '</style>\n</head>\n<body>\n';
 
-  html += '<h1>📄 خروجی فایل‌های متنی - Text2Html v5</h1>\n';
-  html += '<p style="text-align:center;color:#666;margin-bottom:20px">📅 ' + new Date().toLocaleDateString('fa-IR') + ' | تعداد: ' + files.length + ' فایل</p>\n';
-
-  // نوار جستجو
-  html += `<div class="search-box">
-    <input type="text" id="searchBox" placeholder="🔍 جستجو در نام و محتوای فایل‌ها..." oninput="filterFiles()">
-    <span id="searchStats">🔍 ${files.length} فایل نمایش داده شده</span>
-  </div>\n`;
+  h += '<h1>📄 خروجی Text2Html v5 - با قابلیت باز/بسته شدن</h1>\n';
+  h += '<p style="text-align:center;color:#666;margin-bottom:15px">📅 ' + new Date().toLocaleDateString('fa-IR') + ' | تعداد: ' + files.length + ' فایل</p>\n';
+  h += '<div class="search-box"><input type="text" id="sBox" placeholder="🔍 جستجو..." oninput="ff()"><span id="sStats">🔍 ' + files.length + ' فایل نمایش داده شده</span></div>\n';
 
   var cats = Array.from(categories).sort();
-  var fileCounter = 0;
+  var fidx = 0;
+
   for(var ci=0; ci<cats.length; ci++) {
     var cat = cats[ci];
     var catFiles = files.filter(function(f){ return f.category === cat; });
     if(catFiles.length === 0) continue;
-
-    html += '<h2>📁 ' + escapeHtml(cat) + ' (' + catFiles.length + ' فایل)</h2>\n';
+    var cid = 'c_' + ci;
+    
+    h += '<div class="cat-section">\n';
+    h += '  <div class="cat-hdr" onclick="tc(\'' + cid + '\')">\n';
+    h += '    <span class="cat-arrow">▼</span>\n';
+    h += '    <h2>📁 ' + esc(cat) + '</h2>\n';
+    h += '    <span class="cnt">' + catFiles.length + ' فایل</span>\n';
+    h += '    <button class="cat-print" onclick="event.stopPropagation(); pc(\'' + esc(cat) + '\')">🖨️ پرینت دسته</button>\n';
+    h += '  </div>\n';
+    h += '  <div class="cat-body" id="' + cid + '">\n';
 
     for(var fi=0; fi<catFiles.length; fi++) {
       var file = catFiles[fi];
-      var fileId = 'file_' + (fileCounter++);
-      var fileName = escapeHtml(file.name);
-      var fileContent = escapeHtml(file.content);
-      var dataName = fileName.toLowerCase();
-      var dataContent = fileContent.toLowerCase();
+      var fid = 'f' + (fidx++);
+      var fname = esc(file.name);
+      var fcont = esc(file.content);
+      var dn = fname.toLowerCase();
+      var dc = fcont.toLowerCase();
 
-      html += '<div class="file-container" id="' + fileId + '" data-name="' + dataName + '" data-content="' + dataContent + '">\n';
-      html += '  <div class="file-header" onclick="toggleContent(\'' + fileId + '\')">\n';
-      html += '    <span class="file-title" ondblclick="editFileName(\'' + fileId + '\')">' + fileName + '</span>\n';
-      html += '    <div class="btn-group" onclick="event.stopPropagation();">\n';
-      html += '      <button class="btn-copy" onclick="copyContent(\'' + fileId + '\')">📋 کپی</button>\n';
-      html += '      <button class="btn-print" onclick="printFile(\'' + fileId + '\')">🖨️ پرینت</button>\n';
-      html += '      <button class="btn-delete" onclick="deleteFile(\'' + fileId + '\')">🗑️ حذف</button>\n';
-      html += '      <button class="btn-edit" onclick="event.stopPropagation(); toggleTextarea(\'' + fileId + '\')">✏️ ویرایش</button>\n';
-      html += '    </div>\n';
-      html += '  </div>\n';
-      html += '  <div class="content-area">\n';
-      html += '    <textarea readonly ondblclick="enableEdit(\'' + fileId + '\')" oninput="updateDataContent(\'' + fileId + '\')">' + fileContent + '</textarea>\n';
-      html += '    <div class="edit-bar">\n';
-      html += '      <button class="save-btn" onclick="saveEdit(\'' + fileId + '\')">💾 ذخیره</button>\n';
-      html += '      <button class="cancel-btn" onclick="cancelEdit(\'' + fileId + '\')">❌ لغو</button>\n';
-      html += '    </div>\n';
-      html += '  </div>\n';
-      html += '</div>\n';
+      h += '<div class="file-box" id="' + fid + '" data-n="' + dn + '" data-c="' + dc + '">\n';
+      h += '  <div class="file-hdr" onclick="tf(\'' + fid + '\')">\n';
+      h += '    <span class="file-title" ondblclick="efn(\'' + fid + '\')">📄 ' + fname + '</span>\n';
+      h += '    <div class="btn-grp" onclick="event.stopPropagation();">\n';
+      h += '      <button class="btn-copy" onclick="cf(\'' + fid + '\')">📋 کپی</button>\n';
+      h += '      <button class="btn-print" onclick="pf(\'' + fid + '\')">🖨️ پرینت</button>\n';
+      h += '      <button class="btn-del" onclick="df(\'' + fid + '\')">🗑️ حذف</button>\n';
+      h += '      <button class="btn-edit" onclick="event.stopPropagation(); te(\'' + fid + '\')">✏️ ویرایش</button>\n';
+      h += '    </div>\n';
+      h += '  </div>\n';
+      h += '  <div class="cnt-area">\n';
+      h += '    <textarea readonly ondblclick="ee(\'' + fid + '\')" oninput="ud(\'' + fid + '\')">' + fcont + '</textarea>\n';
+      h += '    <div class="edit-bar">\n';
+      h += '      <button class="sv" onclick="se(\'' + fid + '\')">💾 ذخیره</button>\n';
+      h += '      <button class="cn" onclick="ce(\'' + fid + '\')">❌ لغو</button>\n';
+      h += '    </div>\n';
+      h += '  </div>\n';
+      h += '</div>\n';
     }
+
+    h += '  </div>\n';
+    h += '</div>\n';
   }
 
-  // جاوااسکریپت داخلی - همه توابع به صورت سراسری
-  html += '<script>\n';
-  html += 'function toggleContent(id){var el=document.getElementById(id);if(!el)return;var content=el.querySelector(".content-area");if(content.style.display==="block"){content.style.display="none"}else{content.style.display="block"}}\n';
-  html += 'function toggleTextarea(id){var el=document.getElementById(id);if(!el)return;var content=el.querySelector(".content-area");if(content.style.display==="block"){content.style.display="none"}else{content.style.display="block";enableEdit(id)}}\n';
-  html += 'function enableEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){ta.readOnly=false;ta.style.borderColor="#3498db";ta.style.backgroundColor="#fff";editBar.style.display="flex"}}\n';
-  html += 'function saveEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){ta.readOnly=true;ta.style.borderColor="#ddd";ta.style.backgroundColor="#f9f9f9";editBar.style.display="none";el.setAttribute("data-content",ta.value.toLowerCase());filterFiles()}}\n';
-  html += 'function cancelEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){var original=el.getAttribute("data-original-content");if(original)ta.value=original;ta.readOnly=true;ta.style.borderColor="#ddd";ta.style.backgroundColor="#f9f9f9";editBar.style.display="none";el.setAttribute("data-content",ta.value.toLowerCase());filterFiles()}}\n';
-  html += 'function updateDataContent(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");if(ta)el.setAttribute("data-content",ta.value.toLowerCase())}\n';
-  html += 'function editFileName(id){var el=document.getElementById(id);if(!el)return;var titleSpan=el.querySelector(".file-title");if(!titleSpan)return;var oldName=titleSpan.textContent;var input=document.createElement("input");input.type="text";input.value=oldName;input.style.fontSize="13px";input.style.flex="1";input.style.padding="2px 6px";input.style.borderRadius="5px";input.style.border="1px solid #3498db";titleSpan.replaceWith(input);input.focus();input.select();function done(){var val=input.value.trim();if(val.length===0){alert("نام نمی‌تواند خالی باشد");input.focus();return}titleSpan.textContent=val;input.replaceWith(titleSpan);el.setAttribute("data-name",val.toLowerCase());filterFiles()}input.addEventListener("blur",done);input.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();done()}else if(e.key==="Escape"){input.replaceWith(titleSpan)}})}\n';
-  html += 'function copyContent(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");if(!ta)return;navigator.clipboard.writeText(ta.value).then(function(){alert("✅ کپی شد")}).catch(function(){alert("❌ خطا در کپی")})}\n';
-  html += 'function printFile(id){var el=document.getElementById(id);if(!el)return;var title=el.querySelector(".file-title").textContent;var ta=el.querySelector("textarea");if(!ta)return;var win=window.open("","_blank","width=800,height=600");if(!win){alert("پنجره مسدود");return}var content=ta.value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");var printHtml=\'<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>\'+title+\'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 \'+title+\'</h1><pre>\'+content+\'</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\\/script></body></html>\';win.document.write(printHtml);win.document.close()}\n';
-  html += 'function deleteFile(id){if(!confirm("آیا فایل حذف شود؟"))return;var el=document.getElementById(id);if(el){el.remove();filterFiles()}}\n';
-  html += 'function filterFiles(){var query=document.getElementById("searchBox").value.trim().toLowerCase();var containers=document.querySelectorAll(".file-container");var count=0;containers.forEach(function(c){var name=c.getAttribute("data-name")||"";var content=c.getAttribute("data-content")||"";if(name.indexOf(query)!==-1||content.indexOf(query)!==-1){c.style.display="block";count++}else{c.style.display="none"}});document.getElementById("searchStats").textContent="🔍 "+count+" فایل نمایش داده شده"}\n';
-  html += 'document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".file-container").forEach(function(el){var ta=el.querySelector("textarea");if(ta)el.setAttribute("data-original-content",ta.value)});filterFiles()});\n';
-  html += '<\/script>\n';
+  h += '<div class="ftr">📄 ساخته شده با Text2Html v5 - ' + new Date().toLocaleDateString('fa-IR') + '</div>\n';
 
-  html += '</body>\n</html>';
+  h += '<script>\n';
+  // باز/بسته کردن دسته
+  h += 'function tc(id){var e=document.getElementById(id);if(!e)return;var h=e.previousElementSibling;var a=h.querySelector(".cat-arrow");if(e.style.display==="block"||e.style.display===""){e.style.display="none";a.classList.add("clps")}else{e.style.display="block";a.classList.remove("clps")}}\n';
+  // باز/بسته کردن فایل
+  h += 'function tf(id){var c=document.querySelector("#"+id+" .cnt-area");if(c.style.display==="block"){c.style.display="none"}else{c.style.display="block"}}\n';
+  // ویرایش و باز کردن همزمان
+  h += 'function te(id){tf(id);ee(id)}\n';
+  // فعال کردن ویرایش
+  h += 'function ee(id){var t=document.querySelector("#"+id+" textarea");var e=document.querySelector("#"+id+" .edit-bar");if(t&&e){t.readOnly=false;t.style.borderColor="#3498db";t.style.backgroundColor="#fff";e.style.display="flex"}}\n';
+  // ذخیره ویرایش
+  h += 'function se(id){var t=document.querySelector("#"+id+" textarea");var e=document.querySelector("#"+id+" .edit-bar");if(t&&e){t.readOnly=true;t.style.borderColor="#ddd";t.style.backgroundColor="#fff";e.style.display="none";document.getElementById(id).setAttribute("data-c",t.value.toLowerCase());ff()}}\n';
+  // لغو ویرایش
+  h += 'function ce(id){var t=document.querySelector("#"+id+" textarea");var e=document.querySelector("#"+id+" .edit-bar");var d=document.getElementById(id);if(d.getAttribute("data-o"))t.value=d.getAttribute("data-o");t.readOnly=true;t.style.borderColor="#ddd";t.style.backgroundColor="#fff";e.style.display="none";d.setAttribute("data-c",t.value.toLowerCase());ff()}\n';
+  // به‌روزرسانی data-c
+  h += 'function ud(id){var e=document.getElementById(id);if(e)e.setAttribute("data-c",document.querySelector("#"+id+" textarea").value.toLowerCase())}\n';
+  // کپی
+  h += 'function cf(id){navigator.clipboard.writeText(document.querySelector("#"+id+" textarea").value).then(function(){alert("✅ کپی شد")}).catch(function(){alert("❌ خطا")})}\n';
+  // پرینت فایل
+  h += 'function pf(id){var t=document.querySelector("#"+id+" .file-title").textContent.replace("📄 ","");var c=document.querySelector("#"+id+" textarea").value;var w=window.open("","_blank","width=800,height=600");var e=c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");w.document.write(\'<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>\'+t+\'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 \'+t+\'</h1><pre>\'+e+\'</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\\/script></body></html>\');w.document.close()}\n';
+  // پرینت دسته
+  h += 'function pc(cat){var items=document.querySelectorAll(".file-box");var files=[];items.forEach(function(it){var p=it.closest(".cat-section");if(p){var h=p.querySelector("h2");if(h&&h.textContent.includes(cat)){var t=it.querySelector(".file-title").textContent.replace("📄 ","");var c=it.querySelector("textarea").value;files.push({n:t,c:c})}}});if(files.length===0){alert("فایلی نیست");return}var w=window.open("","_blank","width=900,height=700");var h=\'<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>\'+cat+\'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5;color:#333}.it{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 0 5px rgba(0,0,0,0.1)}.fn{font-weight:700;color:#2c3e50}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📁 \'+cat+\' (\'+files.length+\' فایل)</h1>\';for(var i=0;i<files.length;i++){var e=files[i].c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");h+=\'<div class="it"><div class="fn">📄 \'+files[i].n+\'</div><pre>\'+e+\'</pre></div>\'}h+=\'<script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\\/script></body></html>\';w.document.write(h);w.document.close()}\n';
+  // حذف فایل
+  h += 'function df(id){if(confirm("حذف شود؟")){document.getElementById(id).remove();ff()}}\n';
+  // ویرایش نام فایل
+  h += 'function efn(id){var s=document.querySelector("#"+id+" .file-title");var o=s.textContent.replace("📄 ","");var i=document.createElement("input");i.type="text";i.value=o;i.style.cssText="font-size:13px;flex:1;padding:3px 8px;border:2px solid #3498db;border-radius:5px";s.replaceWith(i);i.focus();i.select();function d(){var v=i.value.trim();if(v){s.textContent="📄 "+v;i.replaceWith(s);document.getElementById(id).setAttribute("data-n",v.toLowerCase());ff()}else{alert("نام خالی");i.focus()}}i.addEventListener("blur",d);i.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();d()}else if(e.key==="Escape"){i.replaceWith(s)}})}\n';
+  // فیلتر
+  h += 'function ff(){var q=document.getElementById("sBox").value.trim().toLowerCase();var cs=document.querySelectorAll(".file-box");var c=0;cs.forEach(function(e){var n=e.getAttribute("data-n")||"";var ct=e.getAttribute("data-c")||"";if(n.indexOf(q)!==-1||ct.indexOf(q)!==-1){e.style.display="block";c++}else{e.style.display="none"}});document.getElementById("sStats").textContent="🔍 "+c+" فایل نمایش داده شده"}\n';
+  // مقداردهی اولیه
+  h += 'document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".file-box").forEach(function(e){var t=document.querySelector("#"+e.id+" textarea");if(t)e.setAttribute("data-o",t.value)});ff()});\n';
+  h += '<\/script>\n';
+  h += '</body>\n</html>';
 
-  download('output.html', html, 'text/html');
-  toast('✅ خروجی HTML با امکانات کامل ساخته شد','success');
+  download('output.html', h, 'text/html');
+  toast('✅ خروجی HTML با قابلیت باز/بسته شدن دسته‌ها و فایل‌ها ساخته شد','success');
 });
 // ============================================================
 // پایان بخش exportHtmlBtn
 // ============================================================
 
+// رویدادهای اولیه
 document.addEventListener('DOMContentLoaded', function() {
   var loaded = loadFromDB();
   if(!loaded) {
-    files.push({ id: idCounter++, name: 'سلام.txt', content: 'سلام! به Text2Html v5 خوش آمدید.\nاین یک فایل نمونه است.', category: 'آموزشی' });
+    files.push({ id: idCounter++, name: 'نمونه.txt', content: 'سلام! به Text2Html v5 خوش آمدید.\nاین یک فایل نمونه است.', category: 'آموزشی' });
     categories.add('آموزشی');
   }
-  render();
-  searchDo();
-  updateInfo();
+  render(); searchDo(); updateInfo();
 
   var dropArea = document.getElementById('dropArea');
   if(dropArea) {
@@ -940,10 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if(files.some(f => f.category === cat && f.name === name)) { toast('نام تکراری است','warning'); return; }
     files.push({ id: idCounter++, name: name, content: content, category: cat });
     categories.add(cat);
-    updateCatList();
-    render();
-    searchDo();
-    saveToDB();
+    updateCatList(); render(); searchDo(); saveToDB();
     document.getElementById('manualName').value = '';
     document.getElementById('manualCat').value = '';
     document.getElementById('manualContent').value = '';
@@ -964,74 +435,42 @@ document.addEventListener('DOMContentLoaded', function() {
     var data = { exportDate: new Date().toISOString(), files: files.map(f=> ({ id: f.id, name: f.name, content: f.content, category: f.category })), openStates: openStates };
     download('text2html_backup.json', JSON.stringify(data, null, 2), 'application/json');
     toast('✅ JSON ساخته شد','success');
+toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
   });
 
-  document.getElementById('importJsonLabel').addEventListener('click', function(e){
-    e.preventDefault();
-    document.getElementById('importJsonInput').click();
+  document.getElementById('exportJsonBtn').addEventListener('click', function(){
+    if(files.length === 0) { toast('فایلی نیست','warning'); return; }
+    var data = { exportDate: new Date().toISOString(), files: files.map(f=> ({ id: f.id, name: f.name, content: f.content, category: f.category })), openStates: openStates };
+    download('text2html_backup.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('✅ JSON ساخته شد','success');
   });
 
   document.getElementById('importJsonInput').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if(!file) return;
-    if(file.size > 2 * 1024 * 1024) { 
-      toast('حجم JSON زیاد است','error'); 
-      this.value = ''; 
-      return; 
-    }
     var reader = new FileReader();
     reader.onload = function(ev) {
       try {
         var data = JSON.parse(ev.target.result);
         var imported = data.files || data;
-        if(!Array.isArray(imported)) { 
-          toast('JSON معتبر نیست','error'); 
-          document.getElementById('importJsonInput').value = '';
-          return; 
-        }
-        if(imported.length > MAX_FILES) { 
-          toast('تعداد فایل‌ها زیاد است','error'); 
-          document.getElementById('importJsonInput').value = '';
-          return; 
-        }
+        if(!Array.isArray(imported)) { toast('JSON معتبر نیست','error'); return; }
         undoData = { action: 'cat', cat: 'ورودی JSON', files: files.map(f=> JSON.parse(JSON.stringify(f))) };
         document.getElementById('undoBtn').disabled = false;
-        files = imported.map(function(f, i){
-          return {
-            id: f.id || idCounter++,
-            name: f.name || 'file_' + (i+1) + '.txt',
-            content: f.content || '',
-            category: f.category || 'دسته‌بندی نشده'
-          };
-        });
+        files = imported.map(function(f, i){ return { id: f.id || idCounter++, name: f.name || 'file_' + (i+1) + '.txt', content: f.content || '', category: f.category || 'دسته‌بندی نشده' }; });
         openStates = data.openStates || {};
         categories = new Set(files.map(f=>f.category));
-        if(files.length > 0) {
-          idCounter = Math.max(...files.map(f=> f.id || 0)) + 1;
-          if(isNaN(idCounter)) idCounter = files.length + 1;
-        }
-        render();
-        searchDo();
-        saveToDB();
+        if(files.length > 0) { idCounter = Math.max(...files.map(f=> f.id || 0)) + 1; if(isNaN(idCounter)) idCounter = files.length + 1; }
+        render(); searchDo(); saveToDB();
         toast('✅ ' + files.length + ' فایل از JSON وارد شد','success');
         document.getElementById('importJsonInput').value = '';
-      } catch(err) {
-        toast('❌ خطا در خواندن JSON: ' + err.message,'error');
-        document.getElementById('importJsonInput').value = '';
-      }
+      } catch(err) { toast('❌ خطا در خواندن JSON','error'); document.getElementById('importJsonInput').value = ''; }
     };
     reader.readAsText(file);
   });
 
   document.getElementById('exportZipBtn').addEventListener('click', function(){
-    if(files.length === 0) { 
-      toast('فایلی نیست','warning'); 
-      return; 
-    }
-    if(typeof JSZip === 'undefined') { 
-      toast('⚠️ ZIP در دسترس نیست','warning'); 
-      return; 
-    }
+    if(files.length === 0) { toast('فایلی نیست','warning'); return; }
+    if(typeof JSZip === 'undefined') { toast('⚠️ ZIP در دسترس نیست','warning'); return; }
     try {
       var zip = new JSZip();
       var catMap = {};
@@ -1076,21 +515,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('dark');
     darkToggle.textContent = '☀️';
   }
- darkToggle.addEventListener('click', function(){
+  darkToggle.addEventListener('click', function(){
     document.body.classList.toggle('dark');
     var isDark = document.body.classList.contains('dark');
     this.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('t2h_dark_v5', isDark);
-  });
-
-  var fontSelect = document.getElementById('fontSelect');
-  if(localStorage.getItem('t2h_font_v5')) {
-    fontSelect.value = localStorage.getItem('t2h_font_v5');
-    document.body.style.fontFamily = fontSelect.value;
-  }
-  fontSelect.addEventListener('change', function(){
-    document.body.style.fontFamily = this.value;
-    localStorage.setItem('t2h_font_v5', this.value);
   });
 
   var helpBtn = document.getElementById('helpBtn');
@@ -1103,7 +532,6 @@ document.addEventListener('DOMContentLoaded', function() {
   authorBtn.textContent = '👤';
   authorBtn.style.cssText = 'background:#eee;border:1px solid #aaa;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;color:#333';
   document.querySelector('.header-buttons').appendChild(authorBtn);
-
   var authorModal = document.getElementById('authorModal');
   authorBtn.addEventListener('click', function(){ authorModal.classList.add('active'); });
   document.getElementById('closeAuthor').addEventListener('click', function(){ authorModal.classList.remove('active'); });
@@ -1122,6 +550,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('saveSearchResultsBtn').addEventListener('click', saveSearchResults);
   document.getElementById('saveSearchTextsBtn').addEventListener('click', saveSearchTexts);
   document.getElementById('saveSearchJsonBtn').addEventListener('click', saveSearchJson);
+  
+  var printSearchBtn = document.getElementById('printSearchResultsBtn');
+  if(printSearchBtn) {
+    printSearchBtn.addEventListener('click', printSearchResults);
+  }
 
   document.addEventListener('keydown', function(e) {
     if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
