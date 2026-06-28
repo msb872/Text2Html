@@ -1,580 +1,116 @@
-
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Text2Html HTML </title>
- 
-<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+<title>Text2Html v5.0 - کامل</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  :root {
-    --primary: #3498db;
-    --primary-dark: #2980b9;
-    --primary-light: #1565c0;
-    --bg: #f0f4f8;
-    --card: #ffffff;
-    --text: #333;
-    --text-light: #666;
-    --border: #ddd;
-    --shadow: 0 2px 8px rgba(0,0,0,0.08);
-    --radius: 10px;
-    --header-bg: #ffffff;
-    --danger: #e74c3c;
-    --success: #27ae60;
-    --warning: #f39c12;
-  }
-
-  body {
-    font-family: Tahoma, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    direction: rtl;
-  }
-
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background: var(--header-bg);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 10px 20px;
-  }
-
-  .header-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .header-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--primary-light);
-    white-space: nowrap;
-  }
-
-  .header-buttons {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .header-buttons button, .header-buttons label {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-    white-space: nowrap;
-  }
-
-  .header-buttons button:hover, .header-buttons label:hover {
-    background: var(--primary-dark);
-  }
-
-  .header-buttons .danger { background: var(--danger); }
-  .header-buttons .success { background: var(--success); }
-
-  .font-select {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-  }
-
-  .font-select select {
-    padding: 4px 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 13px;
-  }
-
-  .main {
-    max-width: 1000px;
-    margin: 70px auto 0;
-    padding: 20px;
-  }
-
-  .info-bar {
-    background: var(--card);
-    padding: 10px 15px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 15px;
-    font-weight: bold;
-    color: var(--primary-light);
-    text-align: center;
-  }
-
-  .drop-area {
-    border: 2px dashed var(--border);
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 25px;
-    margin-bottom: 20px;
-    text-align: center;
-    transition: 0.3s;
-  }
-
-  .drop-area.dragover {
-    border-color: var(--primary);
-    background: #e8f4fd;
-  }
-
-  .drop-area p {
-    margin-bottom: 15px;
-    color: var(--text-light);
-  }
-
-  .drop-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .drop-controls input[type="text"] {
-    padding: 8px 12px;
-    border: 2px solid var(--primary);
-    border-radius: 6px;
-    font-size: 14px;
-    width: 200px;
-    outline: none;
-  }
-
-  .drop-controls button {
-    padding: 8px 18px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-  }
-
-  .drop-controls button:hover {
-    background: var(--primary-dark);
-  }
-
-  .manual-section {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-  }
-
-  .manual-section h3 {
-    color: var(--primary-light);
-    margin-bottom: 15px;
-  }
-
-  .manual-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-
-  .manual-grid label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 14px;
-  }
-
-  .manual-grid input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-  }
-
-  .manual-grid input:focus {
-    border-color: var(--primary);
-  }
-
-  .manual-section textarea {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: monospace;
-    resize: vertical;
-    min-height: 100px;
-    outline: none;
-    margin-bottom: 15px;
-  }
-
-  .manual-section textarea:focus {
-    border-color: var(--primary);
-  }
-
-  .manual-section button {
-    padding: 10px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 15px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-  }
-
-  .manual-section button:hover {
-    background: var(--primary-dark);
-  }
-
-  .category-box {
-    background: var(--card);
-    border-radius: var(--radius);
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-
-  .category-header {
-    display: flex;
-    align-items: center;
-    padding: 12px 18px;
-    cursor: pointer;
-    user-select: none;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .category-header .arrow {
-    font-size: 14px;
-    transition: 0.3s;
-    color: var(--primary);
-  }
-
-  .category-header .arrow.collapsed {
-    transform: rotate(-90deg);
-  }
-
-  .category-header h2 {
-    flex: 1;
-    font-size: 17px;
-    color: var(--primary-light);
-    cursor: text;
-  }
-
-  .category-header .count {
-    font-size: 13px;
-    color: var(--text-light);
-    background: var(--bg);
-    padding: 2px 10px;
-    border-radius: 20px;
-  }
-
-  .category-header .cat-actions button {
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: transparent;
-    cursor: pointer;
-    font-size: 12px;
-    transition: 0.2s;
-  }
-
-  .category-header .cat-actions button:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-
-  .category-header .cat-actions .danger:hover {
-    border-color: var(--danger);
-    color: var(--danger);
-  }
-
-  .files-container {
-    padding: 0 18px 14px;
-    border-right: 3px solid var(--primary-light);
-    margin-right: 18px;
-  }
-
-  .file-item {
-    background: var(--bg);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    overflow: hidden;
-  }
-
-  .file-header {
-    display: flex;
-    align-items: center;
-    padding: 8px 14px;
-    cursor: pointer;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .file-header .arrow {
-    font-size: 12px;
-    transition: 0.3s;
-    color: var(--primary);
-  }
-
-  .file-header .arrow.open {
-    transform: rotate(90deg);
-  }
-
-  .file-header .fname {
-    flex: 1;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: text;
-  }
-
-  .file-header .file-actions {
-    display: flex;
-    gap: 5px;
-  }
-
-  .file-header .file-actions button {
-    padding: 4px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-  }
-
-  .file-header .file-actions button:hover {
-    background: var(--primary-dark);
-  }
-
-  .file-header .file-actions .success { background: var(--success); }
-  .file-header .file-actions .danger { background: var(--danger); }
-  .file-header .file-actions .warning { background: var(--warning); color:#333; }
-
-  .file-content {
-    display: none;
-    padding: 10px 14px 14px;
-    border-top: 2px solid var(--primary-light);
-  }
-
-  .file-content textarea {
-    width: 100%;
-    height: 120px;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: monospace;
-    font-size: 13px;
-    resize: vertical;
-    outline: none;
-  }
-
-  .file-content textarea:focus {
-    border-color: var(--primary);
-  }
-
-  .file-content .content-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .file-content .content-actions button {
-    padding: 5px 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
-  }
-
-  .file-content .content-actions button:hover {
-    background: var(--primary-dark);
-  }
-
-  .search-section {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin: 20px 0 40px;
-    box-shadow: var(--shadow);
-  }
-
-  .search-section h3 {
-    color: var(--primary-light);
-    margin-bottom: 12px;
-  }
-
-  .search-section input {
-    width: 100%;
-    max-width: 400px;
-    padding: 10px 14px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-  }
-
-  .search-section input:focus {
-    border-color: var(--primary);
-  }
-
-  .search-results {
-    margin-top: 15px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-
-  .search-results div {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .search-results div:last-child {
-    border-bottom: none;
-  }
-
-  mark {
-    background: #fff59d;
-    color: #7b6f00;
-    padding: 0 3px;
-    border-radius: 3px;
-  }
-
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0; top: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal.active {
-    display: flex;
-  }
-
-  .modal-content {
-    background: var(--card);
-    border-radius: var(--radius);
-    max-width: 450px;
-    width: 90%;
-    padding: 25px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-
-  .modal-content h3 {
-    color: var(--primary-light);
-    margin-bottom: 15px;
-  }
-
-  .modal-content .close {
-    position: absolute;
-    top: 10px;
-    left: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--text-light);
-  }
-
-  .modal-content ul {
-    padding-right: 20px;
-    line-height: 1.8;
-  }
-
-  .toast-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3000;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .toast {
-    background: #333;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: 0.3s;
-    pointer-events: none;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .toast.success { background: var(--success); }
-  .toast.error { background: var(--danger); }
-  .toast.warning { background: var(--warning); color: #333; }
-
-  .inline-edit {
-    padding: 4px 8px;
-    border: 2px solid var(--primary);
-    border-radius: 6px;
-    font-size: inherit;
-    font-family: inherit;
-    outline: none;
-    width: 100%;
-    max-width: 250px;
-  }
-
-  @media (max-width: 700px) {
-    .header-inner { flex-direction: column; align-items: stretch; }
-    .header-buttons { justify-content: center; }
-    .main { margin-top: 120px; padding: 12px; }
-    .manual-grid { grid-template-columns: 1fr; }
-  }
+  /* استایل‌ها */
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--primary:#3498db;--primary-dark:#2980b9;--primary-light:#1565c0;--bg:#f0f4f8;--card:#fff;--text:#333;--text-light:#666;--border:#ddd;--radius:10px;--danger:#e74c3c;--success:#27ae60;--warning:#f39c12}
+  body{font-family:Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;transition:.3s}
+  body.dark{--bg:#1a1a2e;--card:#16213e;--text:#e0e0e0;--text-light:#aaa;--border:#2a2a4a}
+  .header{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--card);box-shadow:0 2px 10px rgba(0,0,0,.1);padding:10px 20px}
+  .header-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .header-title{font-size:20px;font-weight:700;color:var(--primary-light)}
+  .header-buttons{display:flex;gap:6px;flex-wrap:wrap}
+  .header-buttons button,.header-buttons label{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:13px;background:var(--primary);color:#fff;transition:.2s}
+  .header-buttons button:hover,.header-buttons label:hover{background:var(--primary-dark)}
+  .header-buttons .danger{background:var(--danger)}
+  .header-buttons .success{background:var(--success)}
+  .font-select{display:flex;align-items:center;gap:4px;font-size:13px}
+  .font-select select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)}
+  .main{max-width:1000px;margin:70px auto 0;padding:20px}
+  .info-bar{background:var(--card);padding:10px 15px;border-radius:var(--radius);margin-bottom:15px;font-weight:700;color:var(--primary-light);text-align:center}
+  .drop-area{border:2px dashed var(--border);background:var(--card);border-radius:var(--radius);padding:25px;margin-bottom:20px;text-align:center;transition:.3s}
+  .drop-area.dragover{border-color:var(--primary);background:#e8f4fd}
+  body.dark .drop-area.dragover{background:#1a2744}
+  .drop-area p{margin-bottom:15px;color:var(--text-light)}
+  .drop-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .drop-controls input[type="text"]{padding:8px 12px;border:2px solid var(--primary);border-radius:6px;font-size:14px;width:200px;outline:none;background:var(--card);color:var(--text)}
+  .drop-controls button{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px;background:var(--primary);color:#fff;transition:.2s}
+  .drop-controls button:hover{background:var(--primary-dark)}
+  .manual-section{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+  .manual-section h3{color:var(--primary-light);margin-bottom:15px}
+  .manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+  .manual-grid label{display:block;margin-bottom:5px;font-weight:700;font-size:14px}
+  .manual-grid input{width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:6px;font-size:14px;outline:none;background:var(--card);color:var(--text)}
+  .manual-grid input:focus{border-color:var(--primary)}
+  .manual-section textarea{width:100%;padding:10px;border:2px solid var(--border);border-radius:6px;font-size:14px;font-family:monospace;resize:vertical;min-height:100px;outline:none;background:var(--card);color:var(--text);margin-bottom:15px}
+  .manual-section textarea:focus{border-color:var(--primary)}
+  .manual-section button{padding:10px 25px;border:none;border-radius:6px;cursor:pointer;font-size:15px;background:var(--primary);color:#fff;transition:.2s}
+  .manual-section button:hover{background:var(--primary-dark)}
+  .category-box{background:var(--card);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
+  .category-header{display:flex;align-items:center;padding:12px 18px;cursor:pointer;user-select:none;gap:10px;flex-wrap:wrap}
+  .category-header .arrow{font-size:14px;transition:.3s;color:var(--primary)}
+  .category-header .arrow.collapsed{transform:rotate(-90deg)}
+  .category-header h2{flex:1;font-size:17px;color:var(--primary-light);cursor:text}
+  .category-header .count{font-size:13px;color:var(--text-light);background:var(--bg);padding:2px 10px;border-radius:20px}
+  .category-header .cat-actions button{padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px;transition:.2s;color:var(--text)}
+  .category-header .cat-actions button:hover{border-color:var(--primary);color:var(--primary)}
+  .category-header .cat-actions .danger:hover{border-color:var(--danger);color:var(--danger)}
+  .files-container{padding:0 18px 14px;border-right:3px solid var(--primary-light);margin-right:18px}
+  .file-item{background:var(--bg);border-radius:8px;margin-bottom:10px;overflow:hidden}
+  .file-header{display:flex;align-items:center;padding:8px 14px;cursor:pointer;gap:8px;flex-wrap:wrap}
+  .file-header .arrow{font-size:12px;transition:.3s;color:var(--primary)}
+  .file-header .arrow.open{transform:rotate(90deg)}
+  .file-header .fname{flex:1;font-weight:600;font-size:14px;cursor:text}
+  .file-header .file-actions{display:flex;gap:5px}
+  .file-header .file-actions button{padding:4px 10px;border:none;border-radius:5px;cursor:pointer;font-size:12px;background:var(--primary);color:#fff;transition:.2s}
+  .file-header .file-actions button:hover{background:var(--primary-dark)}
+  .file-header .file-actions .success{background:var(--success)}
+  .file-header .file-actions .danger{background:var(--danger)}
+  .file-header .file-actions .warning{background:var(--warning);color:#333}
+  .file-content{display:none;padding:10px 14px 14px;border-top:2px solid var(--primary-light)}
+  .file-content textarea{width:100%;height:120px;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:monospace;font-size:13px;resize:vertical;outline:none;background:var(--card);color:var(--text)}
+  .file-content textarea:focus{border-color:var(--primary)}
+  .file-content .content-actions{display:flex;gap:8px;margin-top:8px}
+  .file-content .content-actions button{padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;background:var(--primary);color:#fff;transition:.2s}
+  .file-content .content-actions button:hover{background:var(--primary-dark)}
+  .search-section{background:var(--card);border-radius:var(--radius);padding:20px;margin:20px 0 40px}
+  .search-section h3{color:var(--primary-light);margin-bottom:12px}
+  .search-section input{width:100%;max-width:400px;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--card);color:var(--text)}
+  .search-section input:focus{border-color:var(--primary)}
+  .search-results{margin-top:15px;max-height:300px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:14px}
+  .search-results div{padding:8px 0;border-bottom:1px solid var(--border)}
+  .search-results div:last-child{border-bottom:none}
+  mark{background:#fff59d;color:#7b6f00;padding:0 3px;border-radius:3px}
+  body.dark mark{background:#5a4f00;color:#fff59d}
+  .search-actions{display:none;margin-top:15px;gap:10px;flex-wrap:wrap;align-items:center}
+  .search-actions.show{display:flex}
+  .search-action-btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+  .search-action-btn:hover{opacity:.85;transform:translateY(-1px)}
+  .search-action-btn.success{background:var(--success);color:#fff}
+  .search-action-btn.primary{background:var(--primary);color:#fff}
+  .search-action-btn.warning{background:var(--warning);color:#333}
+  .search-stats{font-size:13px;color:var(--text-light);align-self:center}
+  .search-notice{background:var(--card);border:1px solid var(--primary);border-radius:6px;padding:10px 15px;margin-top:10px;font-size:13px;color:var(--primary-light);display:none;animation:fadeIn .3s}
+  .search-notice.show{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+  .modal{display:none;position:fixed;z-index:2000;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.4);justify-content:center;align-items:center}
+  .modal.active{display:flex}
+  .modal-content{background:var(--card);border-radius:var(--radius);max-width:450px;width:90%;padding:25px;position:relative}
+  .modal-content h3{color:var(--primary-light);margin-bottom:15px}
+  .modal-content .close{position:absolute;top:10px;left:15px;font-size:24px;cursor:pointer;background:none;border:none;color:var(--text-light)}
+  .modal-content ul{padding-right:20px;line-height:1.8}
+  .toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .toast{background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;opacity:0;transform:translateY(20px);transition:.3s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{background:var(--success)}
+  .toast.error{background:var(--danger)}
+  .toast.warning{background:var(--warning);color:#333}
+  .inline-edit{padding:4px 8px;border:2px solid var(--primary);border-radius:6px;font-size:inherit;font-family:inherit;outline:none;width:100%;max-width:250px;background:var(--card);color:var(--text)}
+  .progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;display:none}
+  .progress-bar .fill{height:100%;background:var(--primary);transition:width .3s;width:0%}
+  @media(max-width:700px){.header-inner{flex-direction:column;align-items:stretch}.header-buttons{justify-content:center}.main{margin-top:120px;padding:12px}.manual-grid{grid-template-columns:1fr}.search-actions{flex-direction:column}.search-action-btn{width:100%}}
 </style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
-</script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
-<!-- ===== هدر ===== -->
 <header class="header">
   <div class="header-inner">
-    <div class="header-title">📄 Text2Html</div>
-    
+    <div class="header-title">📄 Text2Html v5</div>
     <div class="font-select">
       <span>فونت:</span>
       <select id="fontSelect">
@@ -586,29 +122,25 @@
         <option value="Verdana, sans-serif">Verdana</option>
       </select>
     </div>
-
     <div class="header-buttons">
       <button id="toggleAllBtn">📂 همه</button>
       <button id="exportHtmlBtn">🌐 HTML</button>
-      <button id="exportJsonBtn">📋 JSON Out</button>
-      <label for="importJsonInput" style="cursor:pointer">📥 JSON In</label>
+      <button id="exportJsonBtn">📋 JSON</button>
+      <label for="importJsonInput" id="importJsonLabel" style="user-select:none;cursor:pointer;">📥 JSON</label>
       <input type="file" id="importJsonInput" accept=".json" style="display:none">
       <button id="exportZipBtn">📦 ZIP</button>
       <button id="saveFilesBtn">💾 ذخیره</button>
       <button id="clearAllBtn" class="danger">🗑️ پاک کردن</button>
       <button id="undoBtn" disabled>↩️ بازگردانی</button>
-      <button id="darkToggle" style="background:transparent;border:1px solid #aaa;color:#333">🌙</button>
+      <button id="darkToggle" style="background:transparent;border:1px solid #aaa;color:var(--text)">🌙</button>
       <button id="helpBtn" style="background:#eee;color:#333">❓</button>
     </div>
   </div>
 </header>
 
-<!-- ===== محتوای اصلی ===== -->
 <div class="main">
+  <div class="info-bar" id="infoBar">⏳ در حال بارگذاری...</div>
 
-  <div class="info-bar" id="infoBar">فایل‌ها: 0 | دسته‌ها: 0</div>
-
-  <!-- Drop Area -->
   <div class="drop-area" id="dropArea">
     <p>📂 فایل‌های خود را اینجا بکشید و رها کنید</p>
     <div class="drop-controls">
@@ -618,10 +150,10 @@
       <button id="addFilesBtn">➕ افزودن</button>
       <input type="file" id="fileInput" accept=".txt,.bat,.css,.js,.html,.json,.xml,.md,.csv,.log" multiple style="display:none">
     </div>
+    <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
     <p style="font-size:12px;color:#888;margin-top:8px">فرمت‌ها: txt, bat, css, js, html, json, xml, md, csv, log</p>
   </div>
 
-  <!-- Manual Add -->
   <div class="manual-section">
     <h3>✏️ افزودن فایل دستی</h3>
     <div class="manual-grid">
@@ -639,21 +171,24 @@
     <button id="manualAddBtn">➕ افزودن فایل دستی</button>
   </div>
 
-  <!-- Files List -->
   <div id="filesList"></div>
 
-  <!-- Search -->
   <div class="search-section">
     <h3>🔍 جستجو در محتوای فایل‌ها</h3>
     <input type="text" id="searchInput" placeholder="عبارت جستجو..." autocomplete="off">
     <div class="search-results" id="searchResults">
       <p style="color:#888">عبارتی وارد نشده است.</p>
     </div>
+    <div class="search-actions" id="searchActions">
+      <button class="search-action-btn success" id="saveSearchResultsBtn">💾 ذخیره نتایج جستجو</button>
+      <button class="search-action-btn primary" id="saveSearchTextsBtn">📄 ذخیره متن‌های شامل عبارت</button>
+      <button class="search-action-btn warning" id="saveSearchJsonBtn">📋 ذخیره نتایج (JSON)</button>
+      <span class="search-stats" id="searchStats"></span>
+    </div>
+    <div class="search-notice" id="searchNotice"></div>
   </div>
-
 </div>
 
-<!-- ===== مودال‌ها ===== -->
 <div class="modal" id="helpModal">
   <div class="modal-content">
     <button class="close" id="closeHelp">&times;</button>
@@ -666,8 +201,8 @@
       <li><b>میانبر:</b> A = باز/بسته کردن همه، Ctrl+Z = بازگردانی</li>
       <li><b>خروجی:</b> HTML, JSON, ZIP, ذخیره فایل‌ها</li>
       <li><b>جستجو:</b> با تایپ عبارت، نتایج نمایش داده می‌شود</li>
-      <li><b>پرینت و کپی:</b> در خروجی HTML دکمه‌های مجزا برای هر فایل و دسته</li>
-      <li><b>باز و بسته شدن:</b> روی عنوان دسته کلیک کنید تا محتوای آن باز/بسته شود</li>
+      <li><b>خروجی HTML:</b> دارای دکمه‌های باز/بسته، ویرایش، کپی، پرینت و حذف و جستجو</li>
+      <li><b>نسخه:</b> ۵.۰ - نهایی</li>
     </ul>
   </div>
 </div>
@@ -679,86 +214,84 @@
     <p><b>نام:</b> مصیب خانی</p>
     <p><b>تلفن:</b> ۰۹۱۷۳۲۰۶۰۵۲</p>
     <p><b>ایمیل:</b> Mosayeb872@gmail.com</p>
-    <p><b>نسخه:</b> ۴.۰ (نهایی)</p>
+    <p><b>نسخه:</b> ۵.۰ (نهایی)</p>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-// ===== تنظیمات =====
 const MAX_FILES = 500;
 const MAX_SIZE = 10 * 1024 * 1024;
 const ACCEPTED = ['txt','bat','css','js','html','json','xml','md','csv','log'];
-
 let files = [];
 let idCounter = 1;
 let categories = new Set();
 let openStates = {};
 let undoData = null;
 let searchResults = [];
-
-// ===== المان‌ها =====
-const $ = id => document.getElementById(id);
-const dropArea = $('dropArea');
-const fileInput = $('fileInput');
-const catInput = $('catInput');
-const catList = $('catList');
-const filesList = $('filesList');
-const infoBar = $('infoBar');
-const searchInput = $('searchInput');
-const searchResultsDiv = $('searchResults');
-const toastContainer = $('toastContainer');
-
-// ===== توابع پایه =====
+let searchTimer = null;
 
 function escapeHtml(t) {
-  if (!t) return '';
-  return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
+  if(!t) return '';
+  return t.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; });
 }
 
-function toast(msg, type = 'info', dur = 2500) {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
+function toast(msg, type, dur) {
+  type = type || 'info';
+  dur = dur || 2500;
+  var el = document.createElement('div');
+  el.className = 'toast ' + type;
   el.textContent = msg;
-  toastContainer.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, dur);
+  document.getElementById('toastContainer').appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  setTimeout(function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 300); }, dur);
+}
+
+function download(name, content, mime) {
+  var blob = new Blob([content], {type: mime + ';charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 100);
 }
 
 function updateInfo() {
-  infoBar.textContent = `📊 فایل‌ها: ${files.length} | دسته‌ها: ${categories.size}`;
+  var bar = document.getElementById('infoBar');
+  if(bar) bar.textContent = '📊 فایل‌ها: ' + files.length + ' | دسته‌ها: ' + categories.size;
 }
 
 function updateCatList() {
-  catList.innerHTML = '';
-  [...categories].sort().forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c;
-    catList.appendChild(opt);
-  });
+  var list = document.getElementById('catList');
+  if(!list) return;
+  list.innerHTML = '';
+  var arr = Array.from(categories).sort();
+  for(var i=0; i<arr.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = arr[i];
+    list.appendChild(opt);
+  }
 }
 
-function saveData() {
+function saveToDB() {
   try {
-    const data = {
-      files: files.map(f => ({id:f.id, name:f.name, content:f.content, category:f.category})),
-      openStates, idCounter
-    };
-    localStorage.setItem('t2h', JSON.stringify(data));
+    var data = { files: files, openStates: openStates, idCounter: idCounter };
+    localStorage.setItem('t2h_v5_full', JSON.stringify(data));
   } catch(e) {}
 }
 
-function loadData() {
+function loadFromDB() {
   try {
-    const raw = localStorage.getItem('t2h');
-    if (!raw) return false;
-    const data = JSON.parse(raw);
-    if (data.files && Array.isArray(data.files)) {
+    var raw = localStorage.getItem('t2h_v5_full');
+    if(!raw) return false;
+    var data = JSON.parse(raw);
+    if(data.files && data.files.length > 0) {
       files = data.files;
-      idCounter = data.idCounter || Math.max(...files.map(f => f.id || 0), 0) + 1;
       openStates = data.openStates || {};
+      idCounter = data.idCounter || Math.max.apply(null, files.map(f => f.id || 0)) + 1;
+      if(isNaN(idCounter)) idCounter = 1;
       categories = new Set(files.map(f => f.category));
       return true;
     }
@@ -766,233 +299,218 @@ function loadData() {
   return false;
 }
 
-// ===== عملیات اصلی =====
-
 function render() {
-  filesList.innerHTML = '';
-  if (files.length === 0) {
-    filesList.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';
+  var container = document.getElementById('filesList');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  if(files.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';
     updateInfo();
     return;
   }
-
+  
   categories = new Set(files.map(f => f.category));
   updateCatList();
-
-  [...categories].sort().forEach(cat => {
-    const catFiles = files.filter(f => f.category === cat);
-    if (catFiles.length === 0) return;
-
-    const box = document.createElement('div');
+  
+  var catArr = Array.from(categories).sort();
+  for(var ci=0; ci<catArr.length; ci++) {
+    var cat = catArr[ci];
+    var catFiles = files.filter(f => f.category === cat);
+    if(catFiles.length === 0) continue;
+    
+    var box = document.createElement('div');
     box.className = 'category-box';
-
-    // هدر دسته
-    const header = document.createElement('div');
+    
+    var header = document.createElement('div');
     header.className = 'category-header';
-    header.setAttribute('tabindex', '0');
-    header.setAttribute('role', 'button');
-    const isOpen = openStates[cat] !== false;
-    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-
-    const arrow = document.createElement('span');
+    var isOpen = openStates[cat] !== false;
+    
+    var arrow = document.createElement('span');
     arrow.className = 'arrow' + (isOpen ? '' : ' collapsed');
     arrow.textContent = '▼';
-
-    const title = document.createElement('h2');
+    
+    var title = document.createElement('h2');
     title.textContent = cat;
-    title.title = 'کلیک برای ویرایش نام';
-    title.onclick = e => { e.stopPropagation(); editCatName(title, cat); };
-
-    const count = document.createElement('span');
+    title.onclick = function(e){ e.stopPropagation(); editCatName(this, cat); };
+    
+    var count = document.createElement('span');
     count.className = 'count';
-    count.textContent = `${catFiles.length} فایل`;
-
-    const actions = document.createElement('div');
+    count.textContent = catFiles.length + ' فایل';
+    
+    var actions = document.createElement('div');
     actions.className = 'cat-actions';
-
-    const printBtn = document.createElement('button');
-    printBtn.textContent = '🖨️ پرینت';
-    printBtn.onclick = e => { e.stopPropagation(); printCategory(cat); };
-
-    const copyBtn = document.createElement('button');
-    copyBtn.textContent = '📋 کپی';
-    copyBtn.onclick = e => { e.stopPropagation(); copyCategory(cat); };
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'danger';
-    delBtn.textContent = '🗑️ حذف';
-    delBtn.onclick = e => { e.stopPropagation(); deleteCategory(cat); };
-
-    actions.appendChild(printBtn);
-    actions.appendChild(copyBtn);
-    actions.appendChild(delBtn);
-
+    
+    var pBtn = document.createElement('button');
+    pBtn.textContent = '🖨️';
+    pBtn.title = 'پرینت دسته';
+    pBtn.onclick = function(e){ e.stopPropagation(); printCategory(cat); };
+    
+    var cBtn = document.createElement('button');
+    cBtn.textContent = '📋';
+    cBtn.title = 'کپی محتوای دسته';
+    cBtn.onclick = function(e){ e.stopPropagation(); copyCategory(cat); };
+    
+    var dBtn = document.createElement('button');
+    dBtn.className = 'danger';
+    dBtn.textContent = '🗑️';
+    dBtn.title = 'حذف دسته';
+    dBtn.onclick = function(e){ e.stopPropagation(); deleteCategory(cat); };
+    
+    actions.appendChild(pBtn);
+    actions.appendChild(cBtn);
+    actions.appendChild(dBtn);
+    
     header.appendChild(arrow);
     header.appendChild(title);
     header.appendChild(count);
     header.appendChild(actions);
-
-    // محتوای دسته
-    const container = document.createElement('div');
-    container.className = 'files-container';
-    container.style.display = isOpen ? 'block' : 'none';
-
-    header.onclick = () => {
-      const visible = container.style.display === 'block';
-      container.style.display = visible ? 'none' : 'block';
-      arrow.classList.toggle('collapsed', visible);
-      header.setAttribute('aria-expanded', visible ? 'false' : 'true');
-      openStates[cat] = !visible;
-      saveData();
+    
+    var filesContainer = document.createElement('div');
+    filesContainer.className = 'files-container';
+    filesContainer.style.display = isOpen ? 'block' : 'none';
+    
+    header.onclick = function() {
+      var vis = filesContainer.style.display === 'block';
+      filesContainer.style.display = vis ? 'none' : 'block';
+      arrow.classList.toggle('collapsed', vis);
+      openStates[cat] = !vis;
+      saveToDB();
     };
-    header.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); header.click(); }
-    });
-
+    
     box.appendChild(header);
-    box.appendChild(container);
-
-    // فایل‌ها
-    catFiles.sort((a,b) => a.name.localeCompare(b.name)).forEach(file => {
-      const item = document.createElement('div');
+    box.appendChild(filesContainer);
+    
+    var sorted = catFiles.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    for(var fi=0; fi<sorted.length; fi++) {
+      var file = sorted[fi];
+      var item = document.createElement('div');
       item.className = 'file-item';
-
-      const fheader = document.createElement('div');
-      fheader.className = 'file-header';
-      fheader.setAttribute('tabindex', '0');
-      fheader.setAttribute('role', 'button');
-      fheader.setAttribute('aria-expanded', 'false');
-
-      const farrow = document.createElement('span');
+      
+      var fh = document.createElement('div');
+      fh.className = 'file-header';
+      
+      var farrow = document.createElement('span');
       farrow.className = 'arrow';
       farrow.textContent = '▶';
-
-      const fname = document.createElement('span');
-      fname.className = 'fname';
-      fname.textContent = file.name;
-      fname.title = 'کلیک برای ویرایش';
-      fname.onclick = e => { e.stopPropagation(); editFileName(fname, file); };
-
-      const factions = document.createElement('div');
-      factions.className = 'file-actions';
-
-      const copyBtn = document.createElement('button');
-      copyBtn.textContent = '📋 کپی';
-      copyBtn.onclick = e => {
-        e.stopPropagation();
-        navigator.clipboard.writeText(file.content)
-          .then(() => toast('✅ کپی شد', 'success'))
-          .catch(() => toast('❌ خطا', 'error'));
+      
+      var fn = document.createElement('span');
+      fn.className = 'fname';
+      fn.textContent = file.name;
+      fn.onclick = function(e){ e.stopPropagation(); editFileName(this, file); };
+      
+      var fa = document.createElement('div');
+      fa.className = 'file-actions';
+      
+      var copyFileBtn = document.createElement('button');
+      copyFileBtn.textContent = '📋';
+      copyFileBtn.title = 'کپی محتوا';
+      copyFileBtn.onclick = function(e){ 
+        e.stopPropagation(); 
+        navigator.clipboard.writeText(file.content).then(function(){ toast('✅ کپی شد','success'); }).catch(function(){ toast('❌ خطا','error'); }); 
       };
-
-      const printBtn = document.createElement('button');
-      printBtn.className = 'success';
-      printBtn.textContent = '🖨️ پرینت';
-      printBtn.onclick = e => { e.stopPropagation(); printFile(file); };
-
-      const delBtn = document.createElement('button');
-      delBtn.className = 'danger';
-      delBtn.textContent = '🗑️';
-      delBtn.onclick = e => { e.stopPropagation(); deleteFile(file.id); };
-
-      factions.appendChild(copyBtn);
-      factions.appendChild(printBtn);
-      factions.appendChild(delBtn);
-
-      fheader.appendChild(farrow);
-      fheader.appendChild(fname);
-      fheader.appendChild(factions);
-
-      // محتوای فایل
-      const fcontent = document.createElement('div');
-      fcontent.className = 'file-content';
-      fcontent.style.display = 'none';
-
-      const ta = document.createElement('textarea');
+      
+      var printFileBtn = document.createElement('button');
+      printFileBtn.className = 'success';
+      printFileBtn.textContent = '🖨️';
+      printFileBtn.title = 'پرینت فایل';
+      printFileBtn.onclick = function(e){ e.stopPropagation(); printFile(file); };
+      
+      var deleteFileBtn = document.createElement('button');
+      deleteFileBtn.className = 'danger';
+      deleteFileBtn.textContent = '🗑️';
+      deleteFileBtn.title = 'حذف فایل';
+      deleteFileBtn.onclick = function(e){ e.stopPropagation(); deleteFile(file.id); };
+      
+      fa.appendChild(copyFileBtn);
+      fa.appendChild(printFileBtn);
+      fa.appendChild(deleteFileBtn);
+      
+      fh.appendChild(farrow);
+      fh.appendChild(fn);
+      fh.appendChild(fa);
+      
+      var fc = document.createElement('div');
+      fc.className = 'file-content';
+      fc.style.display = 'none';
+      
+      var ta = document.createElement('textarea');
       ta.value = file.content;
-      ta.oninput = e => {
-        const idx = files.findIndex(f => f.id === file.id);
-        if (idx > -1) {
-          files[idx].content = e.target.value;
-        }
+      ta.oninput = function() {
+        var idx = files.findIndex(f=> f.id === file.id);
+        if(idx > -1) files[idx].content = this.value;
         searchDo();
-        saveData();
+        saveToDB();
       };
-
-      const cactions = document.createElement('div');
-      cactions.className = 'content-actions';
-
-      const saveBtn = document.createElement('button');
+      
+      var ca = document.createElement('div');
+      ca.className = 'content-actions';
+      
+      var saveBtn = document.createElement('button');
       saveBtn.textContent = '💾 ذخیره';
-      saveBtn.onclick = e => { e.stopPropagation(); saveData(); toast('✅ ذخیره شد', 'success'); };
-
-      const dlBtn = document.createElement('button');
+      saveBtn.onclick = function(e){ e.stopPropagation(); saveToDB(); toast('✅ ذخیره شد','success'); };
+      
+      var dlBtn = document.createElement('button');
       dlBtn.textContent = '⬇️ دانلود';
-      dlBtn.onclick = e => {
-        e.stopPropagation();
-        download(file.name, file.content, 'text/plain');
+      dlBtn.onclick = function(e){ e.stopPropagation(); download(file.name, file.content, 'text/plain'); };
+      
+      ca.appendChild(saveBtn);
+      ca.appendChild(dlBtn);
+      
+      fc.appendChild(ta);
+      fc.appendChild(ca);
+      
+      item.appendChild(fh);
+      item.appendChild(fc);
+      
+      fh.onclick = function() {
+        var vis = fc.style.display === 'block';
+        fc.style.display = vis ? 'none' : 'block';
+        farrow.classList.toggle('open', !vis);
+        farrow.textContent = vis ? '▶' : '▼';
       };
-
-      cactions.appendChild(saveBtn);
-      cactions.appendChild(dlBtn);
-
-      fcontent.appendChild(ta);
-      fcontent.appendChild(cactions);
-
-      item.appendChild(fheader);
-      item.appendChild(fcontent);
-
-      fheader.onclick = () => {
-        const visible = fcontent.style.display === 'block';
-        fcontent.style.display = visible ? 'none' : 'block';
-        farrow.classList.toggle('open', !visible);
-        farrow.textContent = visible ? '▶' : '▼';
-        fheader.setAttribute('aria-expanded', visible ? 'false' : 'true');
-      };
-      fheader.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fheader.click(); }
-      });
-
-      container.appendChild(item);
-    });
-
-    filesList.appendChild(box);
-  });
+      
+      filesContainer.appendChild(item);
+    }
+    
+    container.appendChild(box);
+  }
+  
   updateInfo();
 }
 
-// ===== ویرایش نام دسته =====
 function editCatName(el, old) {
-  const input = document.createElement('input');
+  var input = document.createElement('input');
   input.type = 'text';
   input.value = old;
   input.className = 'inline-edit';
   el.replaceWith(input);
   input.focus();
   input.select();
-
+  var cancelled = false;
+  
   function done() {
-    let val = input.value.trim();
-    if (!val) { toast('نام نمی‌تواند خالی باشد', 'warning'); input.focus(); return; }
-    if (val === old) { input.replaceWith(el); return; }
-    if (categories.has(val)) { toast('نام تکراری است', 'warning'); input.focus(); return; }
+    if(cancelled) return;
+    var val = input.value.trim();
+    if(!val) { toast('نام نمی‌تواند خالی باشد','warning'); input.focus(); return; }
+    if(val === old) { input.replaceWith(el); return; }
+    if(categories.has(val)) { toast('نام تکراری است','warning'); input.focus(); return; }
     categories.delete(old);
     categories.add(val);
-    files.forEach(f => { if (f.category === old) f.category = val; });
-    render(); searchDo(); updateInfo(); saveData();
-    toast('✅ نام تغییر کرد', 'success');
+    for(var i=0; i<files.length; i++) { if(files[i].category === old) files[i].category = val; }
+    render(); searchDo(); saveToDB();
+    toast('✅ نام تغییر کرد','success');
   }
-
+  
   input.addEventListener('blur', done);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-    else if (e.key === 'Escape') { input.replaceWith(el); }
+  input.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') { e.preventDefault(); this.blur(); }
+    else if(e.key === 'Escape') { cancelled = true; this.replaceWith(el); }
   });
 }
 
-// ===== ویرایش نام فایل =====
 function editFileName(el, file) {
-  const input = document.createElement('input');
+  var input = document.createElement('input');
   input.type = 'text';
   input.value = file.name;
   input.className = 'inline-edit';
@@ -1000,562 +518,620 @@ function editFileName(el, file) {
   el.replaceWith(input);
   input.focus();
   input.select();
-
+  var cancelled = false;
+  
   function done() {
-    let val = input.value.trim();
-    if (!val) { toast('نام نمی‌تواند خالی باشد', 'warning'); input.focus(); return; }
-    if (val === file.name) { input.replaceWith(el); return; }
-    if (files.some(f => f.category === file.category && f.name === val && f.id !== file.id)) {
-      toast('نام تکراری است', 'warning'); input.focus(); return;
+    if(cancelled) return;
+    var val = input.value.trim();
+    if(!val) { toast('نام نمی‌تواند خالی باشد','warning'); input.focus(); return; }
+    if(val === file.name) { input.replaceWith(el); return; }
+    if(files.some(f=> f.category === file.category && f.name === val && f.id !== file.id)) {
+      toast('نام تکراری است','warning'); input.focus(); return;
     }
     file.name = val;
-    render(); searchDo(); saveData();
-    toast('✅ نام تغییر کرد', 'success');
+    render(); searchDo(); saveToDB();
+    toast('✅ نام تغییر کرد','success');
   }
-
+  
   input.addEventListener('blur', done);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-    else if (e.key === 'Escape') { input.replaceWith(el); }
+  input.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') { e.preventDefault(); this.blur(); }
+    else if(e.key === 'Escape') { cancelled = true; this.replaceWith(el); }
   });
 }
 
-// ===== حذف فایل =====
 function deleteFile(id) {
-  const file = files.find(f => f.id === id);
-  if (!file) return;
-  undoData = { action: 'file', file: {...file}, cat: file.category };
-  $('undoBtn').disabled = false;
-  files = files.filter(f => f.id !== id);
-  render(); searchDo(); saveData();
-  toast(`🗑️ "${file.name}" حذف شد`, 'warning');
+  var file = files.find(f=> f.id === id);
+  if(!file) return;
+  undoData = { action: 'file', file: JSON.parse(JSON.stringify(file)), cat: file.category };
+  document.getElementById('undoBtn').disabled = false;
+  files = files.filter(f=> f.id !== id);
+  render(); searchDo(); saveToDB();
+  toast('🗑️ "' + file.name + '" حذف شد','warning');
 }
 
-// ===== حذف دسته =====
 function deleteCategory(cat) {
-  if (!confirm(`آیا دسته "${cat}" و ${files.filter(f=>f.category===cat).length} فایل آن حذف شود؟`)) return;
-  const deleted = files.filter(f => f.category === cat).map(f => ({...f}));
-  undoData = { action: 'cat', cat, files: deleted };
-  $('undoBtn').disabled = false;
-  files = files.filter(f => f.category !== cat);
+  var count = files.filter(f=> f.category === cat).length;
+  if(count === 0) return;
+  if(!confirm('آیا دسته "' + cat + '" و ' + count + ' فایل آن حذف شود؟')) return;
+  var deleted = files.filter(f=> f.category === cat).map(f=> JSON.parse(JSON.stringify(f)));
+  undoData = { action: 'cat', cat: cat, files: deleted };
+  document.getElementById('undoBtn').disabled = false;
+  files = files.filter(f=> f.category !== cat);
   categories.delete(cat);
-  render(); searchDo(); saveData();
-  toast(`🗑️ دسته "${cat}" حذف شد`, 'warning');
+  render(); searchDo(); saveToDB();
+  toast('🗑️ دسته "' + cat + '" حذف شد','warning');
 }
 
-// ===== بازگردانی =====
 function undo() {
-  if (!undoData) return;
-  if (undoData.action === 'file') {
-    files.push({ id: idCounter++, ...undoData.file, category: undoData.cat });
+  if(!undoData) return;
+  if(undoData.action === 'file') {
+    files.push({ id: idCounter++, name: undoData.file.name, content: undoData.file.content, category: undoData.cat });
     categories.add(undoData.cat);
-    toast('↩️ فایل بازگردانی شد', 'success');
-  } else if (undoData.action === 'cat') {
-    undoData.files.forEach(f => {
-      files.push({ id: idCounter++, ...f, category: undoData.cat });
-    });
+    toast('↩️ فایل بازگردانی شد','success');
+  } else if(undoData.action === 'cat') {
+    for(var i=0; i<undoData.files.length; i++) {
+      files.push({ id: idCounter++, name: undoData.files[i].name, content: undoData.files[i].content, category: undoData.cat });
+    }
     categories.add(undoData.cat);
-    toast(`↩️ دسته "${undoData.cat}" بازگردانی شد`, 'success');
+    toast('↩️ دسته "' + undoData.cat + '" بازگردانی شد','success');
   }
   undoData = null;
-  $('undoBtn').disabled = true;
-  render(); searchDo(); saveData();
+  document.getElementById('undoBtn').disabled = true;
+  render(); searchDo(); saveToDB();
 }
 
-// ===== پاک کردن همه =====
 function clearAll() {
-  if (files.length === 0) { toast('چیزی برای پاک کردن نیست', 'warning'); return; }
-  if (!confirm('همه فایل‌ها پاک شوند؟ می‌توانید بازگردانی کنید.')) return;
-  undoData = { action: 'cat', cat: 'همه', files: files.map(f => ({...f})) };
-  $('undoBtn').disabled = false;
+  if(files.length === 0) { toast('چیزی برای پاک کردن نیست','warning'); return; }
+  if(!confirm('همه فایل‌ها پاک شوند؟')) return;
+  undoData = { action: 'cat', cat: 'همه', files: files.map(f=> JSON.parse(JSON.stringify(f))) };
+  document.getElementById('undoBtn').disabled = false;
   files = []; categories.clear();
-  render(); searchDo(); saveData();
-  toast('🗑️ همه پاک شدند', 'warning');
+  render(); searchDo(); saveToDB();
+  toast('🗑️ همه پاک شدند','warning');
 }
 
-// ===== پرینت و کپی =====
 function printFile(file) {
-  const w = window.open('', '_blank', 'width=800,height=600');
-  w.document.write(`
-    <!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="UTF-8">
-    <title>پرینت - ${escapeHtml(file.name)}</title>
-    <style>
-      body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl}
-      h1{color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:10px}
-      .meta{color:#666;font-size:14px;margin-bottom:20px}
-      pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word;border:1px solid #ddd}
-    </style></head><body>
-    <h1>📄 ${escapeHtml(file.name)}</h1>
-    <div class="meta">📁 ${escapeHtml(file.category)} | 📅 ${new Date().toLocaleDateString('fa-IR')} | 📊 ${(file.content.length/1024).toFixed(1)} KB</div>
-    <pre>${escapeHtml(file.content)}</pre>
-    <script>window.onload=function(){window.print();window.close()}<\\/script>
-  </body></html>`);
-  w.document.close();
+  try {
+    var win = window.open('', '_blank', 'width=800,height=600');
+    if(!win) { toast('❌ پنجره مسدود شده','error'); return; }
+    var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + escapeHtml(file.name) + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 ' + escapeHtml(file.name) + '</h1><pre>' + escapeHtml(file.content) + '</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';
+    win.document.write(html);
+    win.document.close();
+  } catch(e) { toast('❌ خطا در پرینت','error'); }
 }
 
 function printCategory(cat) {
-  const catFiles = files.filter(f => f.category === cat);
-  if (catFiles.length === 0) { toast('فایلی نیست', 'warning'); return; }
-  const w = window.open('', '_blank', 'width=900,height=700');
-  let html = `<!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="UTF-8">
-    <title>پرینت - ${escapeHtml(cat)}</title>
-    <style>
-      body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5}
-      h1{color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:10px}
-      .item{background:white;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 5px rgba(0,0,0,0.1);break-inside:avoid}
-      .fname{font-weight:700;color:#2c3e50;border-bottom:1px solid #ddd;padding-bottom:5px;margin-bottom:10px}
-      pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word;border:1px solid #e0e0e0;margin:0}
-    </style></head><body>
-    <h1>📁 ${escapeHtml(cat)} - ${catFiles.length} فایل</h1>
-    <p style="color:#888">📅 ${new Date().toLocaleDateString('fa-IR')}</p>`;
-  catFiles.forEach(f => {
-    html += `<div class="item"><div class="fname">📄 ${escapeHtml(f.name)}</div><pre>${escapeHtml(f.content)}</pre></div>`;
-  });
-  html += `<script>window.onload=function(){window.print();window.close()}<\\/script></body></html>`;
-  w.document.write(html);
-  w.document.close();
+  try {
+    var catFiles = files.filter(f=> f.category === cat);
+    if(catFiles.length === 0) { toast('فایلی نیست','warning'); return; }
+    var win = window.open('', '_blank', 'width=900,height=700');
+    if(!win) { toast('❌ پنجره مسدود شده','error'); return; }
+    var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + escapeHtml(cat) + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5;color:#333}.item{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px}.fname{font-weight:700;color:#2c3e50}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📁 ' + escapeHtml(cat) + ' (' + catFiles.length + ' فایل)</h1>';
+    for(var i=0; i<catFiles.length; i++) {
+      html += '<div class="item"><div class="fname">📄 ' + escapeHtml(catFiles[i].name) + '</div><pre>' + escapeHtml(catFiles[i].content) + '</pre></div>';
+    }
+    html += '<script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\/script></body></html>';
+    win.document.write(html);
+    win.document.close();
+  } catch(e) { toast('❌ خطا در پرینت','error'); }
 }
 
 function copyCategory(cat) {
-  const catFiles = files.filter(f => f.category === cat);
-  if (catFiles.length === 0) { toast('فایلی نیست', 'warning'); return; }
-  let text = '';
-  catFiles.forEach(f => {
-    text += `===== ${f.name} =====\n${f.content}\n\n`;
-  });
-  navigator.clipboard.writeText(text)
-    .then(() => toast(`✅ محتوای ${catFiles.length} فایل کپی شد`, 'success'))
-    .catch(() => toast('❌ خطا در کپی', 'error'));
+  var catFiles = files.filter(f=> f.category === cat);
+  if(catFiles.length === 0) { toast('فایلی نیست','warning'); return; }
+  var text = '';
+  for(var i=0; i<catFiles.length; i++) {
+    text += '===== ' + catFiles[i].name + ' =====\n' + catFiles[i].content + '\n\n';
+  }
+  navigator.clipboard.writeText(text).then(function(){ toast('✅ محتوای ' + catFiles.length + ' فایل کپی شد','success'); }).catch(function(){ toast('❌ خطا در کپی','error'); });
 }
-
-// ===== دانلود =====
-function download(name, content, mime) {
-  const blob = new Blob([content], {type: mime + ';charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 100);
-}
-
-// ===== جستجو =====
-let searchTimer = null;
 
 function searchDo() {
-  const q = searchInput.value.trim();
-  searchResultsDiv.innerHTML = '';
-  if (!q) {
-    searchResultsDiv.innerHTML = '<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';
-    searchResults = [];
+  var input = document.getElementById('searchInput');
+  var resultsDiv = document.getElementById('searchResults');
+  var actions = document.getElementById('searchActions');
+  var stats = document.getElementById('searchStats');
+  var notice = document.getElementById('searchNotice');
+  if(!input || !resultsDiv) return;
+  
+  var q = input.value.trim();
+  resultsDiv.innerHTML = '';
+  searchResults = [];
+  if(actions) actions.classList.remove('show');
+  if(notice) notice.classList.remove('show');
+  
+  if(!q) {
+    resultsDiv.innerHTML = '<p style="color:#888">🔍 عبارتی وارد نشده است.</p>';
     return;
   }
-
-  const results = [];
-  const lower = q.toLowerCase();
-  files.forEach(f => {
-    f.content.split('\n').forEach((line, i) => {
-      if (line.toLowerCase().includes(lower)) {
-        results.push({ id: f.id, name: f.name, cat: f.category, line: i+1, text: line });
+  
+  var results = [];
+  var lower = q.toLowerCase();
+  for(var i=0; i<files.length; i++) {
+    var f = files[i];
+    if(f.content.toLowerCase().includes(lower)) {
+      var lines = f.content.split('\n');
+      for(var j=0; j<lines.length; j++) {
+        if(lines[j].toLowerCase().includes(lower)) {
+          results.push({ id: f.id, name: f.name, cat: f.category, line: j+1, text: lines[j] });
+        }
       }
-    });
-  });
-
-  if (results.length === 0) {
-    searchResultsDiv.innerHTML = '<p style="color:#888">🔍 نتیجه‌ای یافت نشد.</p>';
-    searchResults = [];
+    }
+  }
+  
+  if(results.length === 0) {
+    resultsDiv.innerHTML = '<p style="color:#888">🔍 نتیجه‌ای یافت نشد.</p>';
     return;
   }
-
-  const count = document.createElement('div');
-  count.style.cssText = 'font-weight:700;margin-bottom:8px;color:var(--primary-light)';
-  count.textContent = `✅ ${results.length} نتیجه`;
-  searchResultsDiv.appendChild(count);
-
-  const maxShow = 50;
-  results.slice(0, maxShow).forEach(r => {
-    const div = document.createElement('div');
-    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escapedQ, 'gi');
-    const highlighted = escapeHtml(r.text).replace(regex, m => `<mark>${m}</mark>`);
-    div.innerHTML = `<b>📄</b> ${escapeHtml(r.name)} | <b>📁</b> ${escapeHtml(r.cat)} | <b>🔢</b> خط ${r.line}<br>${highlighted}`;
-    searchResultsDiv.appendChild(div);
-  });
-
-  if (results.length > maxShow) {
-    const more = document.createElement('div');
-    more.style.cssText = 'color:#888;font-style:italic';
-    more.textContent = `... و ${results.length - maxShow} نتیجه دیگر`;
-    searchResultsDiv.appendChild(more);
+  
+  var countDiv = document.createElement('div');
+  countDiv.style.cssText = 'font-weight:700;margin-bottom:8px;color:var(--primary-light)';
+  countDiv.textContent = '✅ ' + results.length + ' نتیجه';
+  resultsDiv.appendChild(countDiv);
+  
+  var maxShow = Math.min(50, results.length);
+  for(var k=0; k<maxShow; k++) {
+    var r = results[k];
+    var escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var regex = new RegExp(escapedQ, 'gi');
+    var highlighted = escapeHtml(r.text).replace(regex, function(m){ return '<mark>' + m + '</mark>'; });
+    var div = document.createElement('div');
+    div.innerHTML = '<b>📄</b> ' + escapeHtml(r.name) + ' | <b>📁</b> ' + escapeHtml(r.cat) + ' | <b>🔢</b> خط ' + r.line + '<br>' + highlighted;
+    resultsDiv.appendChild(div);
   }
-
+  
+  if(results.length > maxShow) {
+    var more = document.createElement('div');
+    more.style.cssText = 'color:#888;font-style:italic';
+    more.textContent = '... و ' + (results.length - maxShow) + ' نتیجه دیگر';
+    resultsDiv.appendChild(more);
+  }
+  
   searchResults = results;
+  
+  if(actions) {
+    actions.classList.add('show');
+    if(stats) stats.textContent = '📊 ' + results.length + ' نتیجه';
+  }
+  if(notice) {
+    notice.textContent = '🔍 ' + results.length + ' نتیجه برای "' + q + '" یافت شد.';
+    notice.classList.add('show');
+  }
 }
 
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(searchDo, 200);
-});
-searchInput.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { searchInput.value = ''; searchDo(); }
-});
-
-// ===== افزودن فایل =====
-function addFiles(fileList) {
-  if (files.length + fileList.length > MAX_FILES) {
-    toast(`❌ حداکثر ${MAX_FILES} فایل`, 'error');
-    return;
+function saveSearchResults() {
+  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
+  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
+  var date = new Date().toLocaleDateString('fa-IR');
+  var text = '📋 گزارش نتایج جستجو\n═══════════════════════════════════════\n🗓 تاریخ: ' + date + '\n🔍 عبارت: "' + q + '"\n📊 تعداد: ' + searchResults.length + '\n═══════════════════════════════════════\n\n';
+  var grouped = {};
+  for(var i=0; i<searchResults.length; i++) {
+    var key = searchResults[i].cat + ' › ' + searchResults[i].name;
+    if(!grouped[key]) grouped[key] = [];
+    grouped[key].push(searchResults[i]);
   }
-  let cat = catInput.value.trim();
-  if (!cat) cat = 'دسته‌بندی نشده';
+  var keys = Object.keys(grouped);
+  for(var j=0; j<keys.length; j++) {
+    text += '📁 ' + keys[j] + '\n───────────────────────\n';
+    for(var k=0; k<grouped[keys[j]].length; k++) {
+      text += '  خط ' + grouped[keys[j]][k].line + ': "' + grouped[keys[j]][k].text.trim() + '"\n\n';
+    }
+  }
+  text += '═══════════════════════════════════════\n';
+  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
+  download('نتایج_جستجو_' + safeQ + '.txt', text, 'text/plain');
+  toast('✅ نتایج جستجو ذخیره شد','success');
+}
+
+function saveSearchTexts() {
+  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
+  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
+  var date = new Date().toLocaleDateString('fa-IR');
+  var text = '📄 متن‌های حاوی "' + q + '"\n═══════════════════════════════════════\n🗓 تاریخ: ' + date + '\n📊 تعداد: ' + searchResults.length + '\n═══════════════════════════════════════\n\n';
+  for(var i=0; i<searchResults.length; i++) {
+    text += '[' + (i+1) + '] ' + searchResults[i].cat + ' › ' + searchResults[i].name + ' (خط ' + searchResults[i].line + '):\n    ' + searchResults[i].text.trim() + '\n\n';
+  }
+  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
+  download('متن‌های_شامل_' + safeQ + '.txt', text, 'text/plain');
+  toast('✅ متن‌ها ذخیره شد','success');
+}
+
+function saveSearchJson() {
+  if(!searchResults || searchResults.length === 0) { toast('❌ نتیجه‌ای نیست','error'); return; }
+  var q = document.getElementById('searchInput').value.trim() || 'جستجو';
+  var data = { exportDate: new Date().toISOString(), query: q, total: searchResults.length, results: searchResults.map(r => ({ fileId: r.id, fileName: r.name, category: r.cat, line: r.line, text: r.text })) };
+  var safeQ = q.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').substring(0, 50);
+  download('نتایج_جستجو_' + safeQ + '.json', JSON.stringify(data, null, 2), 'application/json');
+  toast('✅ JSON ذخیره شد','success');
+}
+
+function addFiles(fileList, targetCategory) {
+  if(files.length + fileList.length > MAX_FILES) { toast('❌ حداکثر ' + MAX_FILES + ' فایل','error'); return; }
+  var cat = targetCategory || document.getElementById('catInput').value.trim();
+  if(!cat) cat = 'دسته‌بندی نشده';
   categories.add(cat);
-
-  let done = 0, total = fileList.length, errors = 0;
-
-  function check() {
-    if (done === total) {
+  var done = 0, total = fileList.length, errors = 0;
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
+  if(progressBar) progressBar.style.display = 'block';
+  
+  function updateProgress() {
+    var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    if(progressFill) progressFill.style.width = pct + '%';
+    if(done === total) {
+      setTimeout(function(){ if(progressBar) progressBar.style.display = 'none'; }, 1000);
       updateCatList();
       render();
-      catInput.value = '';
-      fileInput.value = '';
+      document.getElementById('fileInput').value = '';
       searchDo();
-      saveData();
-      if (total - errors > 0) toast(`✅ ${total - errors} فایل اضافه شد`, 'success');
+      saveToDB();
+      if(total - errors > 0) toast('✅ ' + (total - errors) + ' فایل اضافه شد','success');
+      if(errors > 0) toast('⚠️ ' + errors + ' فایل خطا داشت','warning');
     }
   }
-
-  Array.from(fileList).forEach(file => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (!ACCEPTED.includes(ext)) {
-      toast(`❌ فرمت ${file.name} مجاز نیست`, 'error');
-      done++; errors++; check();
-      return;
-    }
-    if (file.size > MAX_SIZE) {
-      toast(`❌ ${file.name} حجیم است`, 'error');
-      done++; errors++; check();
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      files.push({ id: idCounter++, name: file.name, content: e.target.result, category: cat });
-      done++; check();
-    };
-    reader.onerror = () => { done++; errors++; check(); };
-    reader.readAsText(file);
-  });
+  
+  for(var i=0; i<fileList.length; i++) {
+    var file = fileList[i];
+    var ext = file.name.split('.').pop().toLowerCase();
+    if(ACCEPTED.indexOf(ext) === -1) { errors++; done++; updateProgress(); continue; }
+    if(file.size > MAX_SIZE) { errors++; done++; updateProgress(); continue; }
+    (function(f) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        files.push({ id: idCounter++, name: f.name, content: e.target.result, category: cat });
+        done++; updateProgress();
+      };
+      reader.onerror = function() { errors++; done++; updateProgress(); };
+      reader.readAsText(f);
+    })(file);
+  }
 }
 
-// ===== رویدادها =====
+// ============================================================
+// بخش exportHtmlBtn با امکانات پیشرفته - نسخه اصلاح شده
+// ============================================================
+document.getElementById('exportHtmlBtn').addEventListener('click', function(){
+  if(files.length === 0) { toast('❌ فایلی نیست','error'); return; }
 
-// درگ و دراپ
-dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
-dropArea.addEventListener('dragleave', e => { e.preventDefault(); dropArea.classList.remove('dragover'); });
-dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+  function escapeHtml(t) {
+    if(!t) return '';
+    return t.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; });
+  }
 
-$('selectFilesBtn').onclick = () => fileInput.click();
-$('addFilesBtn').onclick = () => {
-  if (fileInput.files.length === 0) { toast('فایلی انتخاب نشده', 'warning'); return; }
-  addFiles(fileInput.files);
-};
+  var html = '<!DOCTYPE html>\n<html dir="rtl">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>خروجی Text2Html v5</title>\n';
+  html += `<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl;background:#f5f5f5;color:#333}
+    h1{color:#1565c0;margin-bottom:0.5em;text-align:center}
+    h2{color:#2980b9;margin-top:2em;padding-right:10px;border-right:4px solid #2980b9}
+    .search-box{display:flex;justify-content:center;margin:20px 0;gap:10px;flex-wrap:wrap}
+    .search-box input{width:300px;max-width:90%;padding:10px 14px;border:2px solid #3498db;border-radius:8px;font-size:14px;outline:none}
+    .search-box input:focus{border-color:#1565c0}
+    #searchStats{font-size:14px;color:#666;margin:10px 0;text-align:center;display:block;width:100%}
+    .file-container{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 0 6px rgba(0,0,0,0.1)}
+    .file-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:8px;border-radius:6px;transition:background 0.2s}
+    .file-header:hover{background:#f0f0f0}
+    .file-title{font-weight:700;color:#2c3e50;flex:1;user-select:text;cursor:text;padding:4px 8px;border-radius:4px;transition:background 0.2s}
+    .file-title:hover{background:#e8e8e8}
+    .btn-group{display:flex;gap:5px;flex-wrap:wrap}
+    .btn-group button{padding:5px 10px;border:none;border-radius:5px;cursor:pointer;font-size:12px;transition:all 0.2s;white-space:nowrap}
+    .btn-group button:hover{opacity:0.85}
+    .btn-copy{background:#3498db;color:#fff}
+    .btn-print{background:#27ae60;color:#fff}
+    .btn-delete{background:#e74c3c;color:#fff}
+    .btn-edit{background:#f39c12;color:#333}
+    .content-area{display:none;margin-top:10px}
+    .content-area textarea{width:100%;min-height:150px;padding:10px;border:1px solid #ddd;border-radius:6px;resize:vertical;font-family:monospace;font-size:13px;background:#f9f9f9;outline:none}
+    .content-area textarea:focus{border-color:#3498db;background:#fff}
+    .edit-bar{display:none;justify-content:flex-end;gap:8px;margin-top:8px}
+    .edit-bar button{padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;transition:0.2s}
+    .edit-bar button:hover{opacity:0.85}
+    .save-btn{background:#27ae60;color:#fff}
+    .cancel-btn{background:#e74c3c;color:#fff}
+    @media(max-width:600px){.file-header{flex-direction:column;gap:10px}.btn-group{width:100%;justify-content:center}}
+  </style>\n`;
+  html += '</head>\n<body>\n';
 
-// افزودن دستی
-$('manualAddBtn').onclick = () => {
-  const name = $('manualName').value.trim();
-  let cat = $('manualCat').value.trim();
-  const content = $('manualContent').value;
+  html += '<h1>📄 خروجی فایل‌های متنی - Text2Html v5</h1>\n';
+  html += '<p style="text-align:center;color:#666;margin-bottom:20px">📅 ' + new Date().toLocaleDateString('fa-IR') + ' | تعداد: ' + files.length + ' فایل</p>\n';
 
-  if (!name) { toast('نام فایل را وارد کنید', 'warning'); $('manualName').focus(); return; }
-  const ext = name.split('.').pop().toLowerCase();
-  if (!ACCEPTED.includes(ext)) { toast('فرمت مجاز نیست', 'warning'); $('manualName').focus(); return; }
-  if (!cat) cat = 'دسته‌بندی نشده';
-  if (files.some(f => f.category === cat && f.name === name)) { toast('نام تکراری است', 'warning'); return; }
-  if (content.length > MAX_SIZE) { toast('محتوا حجیم است', 'warning'); return; }
-  if (files.length >= MAX_FILES) { toast('ظرفیت پر است', 'error'); return; }
+  // نوار جستجو
+  html += `<div class="search-box">
+    <input type="text" id="searchBox" placeholder="🔍 جستجو در نام و محتوای فایل‌ها..." oninput="filterFiles()">
+    <span id="searchStats">🔍 ${files.length} فایل نمایش داده شده</span>
+  </div>\n`;
 
-  files.push({ id: idCounter++, name, content, category: cat });
-  categories.add(cat);
-  updateCatList();
-  render();
-  searchDo();
-  saveData();
-  $('manualName').value = '';
-  $('manualCat').value = '';
-  $('manualContent').value = '';
-  toast(`✅ "${name}" اضافه شد`, 'success');
-};
+  var cats = Array.from(categories).sort();
+  var fileCounter = 0;
+  for(var ci=0; ci<cats.length; ci++) {
+    var cat = cats[ci];
+    var catFiles = files.filter(function(f){ return f.category === cat; });
+    if(catFiles.length === 0) continue;
 
-// دکمه‌های هدر
-$('toggleAllBtn').onclick = () => {
-  const allOpen = [...categories].every(c => openStates[c] !== false);
-  categories.forEach(c => { openStates[c] = allOpen ? false : true; });
-  render(); saveData();
-  toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
-};
+    html += '<h2>📁 ' + escapeHtml(cat) + ' (' + catFiles.length + ' فایل)</h2>\n';
 
-// ===== خروجی HTML با قابلیت باز و بسته شدن =====
-$('exportHtmlBtn').onclick = () => {
-  if (files.length === 0) { toast('❌ فایلی برای خروجی وجود ندارد.', 'error'); return; }
+    for(var fi=0; fi<catFiles.length; fi++) {
+      var file = catFiles[fi];
+      var fileId = 'file_' + (fileCounter++);
+      var fileName = escapeHtml(file.name);
+      var fileContent = escapeHtml(file.content);
+      var dataName = fileName.toLowerCase();
+      var dataContent = fileContent.toLowerCase();
 
-  let html = `<!DOCTYPE html>
-<html dir="rtl" lang="fa">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>خروجی Text2Html</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Tahoma, sans-serif; background: #f5f5f5; padding: 30px; direction: rtl; }
-    h1 { color: #1565c0; border-bottom: 3px solid #1565c0; padding-bottom: 10px; margin-bottom: 20px; }
-    .category { margin-bottom: 30px; background: white; border-radius: 12px; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .cat-header { 
-      display: flex; align-items: center; gap: 10px; margin: 0 0 15px; flex-wrap: wrap; cursor: pointer; user-select: none;
+      html += '<div class="file-container" id="' + fileId + '" data-name="' + dataName + '" data-content="' + dataContent + '">\n';
+      html += '  <div class="file-header" onclick="toggleContent(\'' + fileId + '\')">\n';
+      html += '    <span class="file-title" ondblclick="editFileName(\'' + fileId + '\')">' + fileName + '</span>\n';
+      html += '    <div class="btn-group" onclick="event.stopPropagation();">\n';
+      html += '      <button class="btn-copy" onclick="copyContent(\'' + fileId + '\')">📋 کپی</button>\n';
+      html += '      <button class="btn-print" onclick="printFile(\'' + fileId + '\')">🖨️ پرینت</button>\n';
+      html += '      <button class="btn-delete" onclick="deleteFile(\'' + fileId + '\')">🗑️ حذف</button>\n';
+      html += '      <button class="btn-edit" onclick="event.stopPropagation(); toggleTextarea(\'' + fileId + '\')">✏️ ویرایش</button>\n';
+      html += '    </div>\n';
+      html += '  </div>\n';
+      html += '  <div class="content-area">\n';
+      html += '    <textarea readonly ondblclick="enableEdit(\'' + fileId + '\')" oninput="updateDataContent(\'' + fileId + '\')">' + fileContent + '</textarea>\n';
+      html += '    <div class="edit-bar">\n';
+      html += '      <button class="save-btn" onclick="saveEdit(\'' + fileId + '\')">💾 ذخیره</button>\n';
+      html += '      <button class="cancel-btn" onclick="cancelEdit(\'' + fileId + '\')">❌ لغو</button>\n';
+      html += '    </div>\n';
+      html += '  </div>\n';
+      html += '</div>\n';
     }
-    .cat-header .arrow { margin-left: 8px; transition: 0.3s; }
-    .cat-header .arrow.collapsed { transform: rotate(-90deg); }
-    .cat-header h2 { color: #1565c0; flex: 1; font-size: 18px; }
-    .cat-header .cat-buttons { display: flex; gap: 5px; margin-right: auto; }
-    .cat-header button { padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; background: #3498db; color: white; transition: 0.2s; }
-    .cat-header button:hover { background: #2980b9; }
-    .cat-header button.print-all { background: #27ae60; }
-    .cat-header button.copy-all { background: #f39c12; color: #333; }
-    .files-container { margin-top: 10px; }
-    .file-item { margin-bottom: 15px; background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
-    .file-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-    .file-name { font-weight: 700; color: #34495e; }
-    .file-buttons { display: flex; gap: 5px; }
-    .file-buttons button { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; background: #3498db; color: white; transition: 0.2s; }
-    .file-buttons button:hover { background: #2980b9; }
-    .file-buttons button.print-file { background: #27ae60; }
-    .file-buttons button.copy-file { background: #f39c12; color: #333; }
-    pre { background: #f9f9f9; padding: 15px; border-radius: 7px; white-space: pre-wrap; word-break: break-word; font-family: monospace; font-size: 13px; border: 1px solid #eee; max-height: 300px; overflow-y: auto; margin: 0; }
-    .meta { color: #888; font-size: 13px; margin-bottom: 5px; }
-    @media print { body { padding: 15px; } .file-buttons, .cat-buttons { display: none; } }
-  </style>
-</head>
-<body>
-<h1>📄 خروجی فایل‌های متنی</h1>
-<p class="meta">📅 ${new Date().toLocaleDateString('fa-IR')} | تعداد فایل‌ها: ${files.length}</p>
-
-<script>
-  // توابع کپی و پرینت
-  function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => alert('✅ متن کپی شد!')).catch(() => alert('❌ خطا در کپی'));
-  }
-  function printPre(preElement) {
-    const content = preElement.textContent;
-    const fileName = preElement.getAttribute('data-filename') || 'فایل';
-    const win = window.open('', '_blank', 'width=800,height=600');
-    win.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>پرینت - ' + fileName + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 ' + fileName + '</h1><pre>' + content + '</pre><script>window.onload=function(){window.print();window.close()}<\\/script></body></html>');
-    win.document.close();
-  }
-  function printCategory(catName) {
-    const items = document.querySelectorAll('.category[data-cat="' + catName + '"] .file-item');
-    if (items.length === 0) return;
-    const win = window.open('', '_blank', 'width=900,height=700');
-    let html = '<html dir="rtl"><head><meta charset="UTF-8"><title>پرینت - ' + catName + '</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;background:#f5f5f5}.item{background:white;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 5px rgba(0,0,0,0.1)}.fname{font-weight:700;color:#2c3e50;border-bottom:1px solid #ddd;padding-bottom:5px;margin-bottom:10px}pre{background:#f9f9f9;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word;border:1px solid #e0e0e0}</style></head><body><h1>📁 ' + catName + '</h1>';
-    items.forEach(item => {
-      const fname = item.querySelector('.file-name').textContent;
-      const content = item.querySelector('pre').textContent;
-      html += '<div class="item"><div class="fname">📄 ' + fname + '</div><pre>' + content + '</pre></div>';
-    });
-    html += '<script>window.onload=function(){window.print();window.close()}<\\/script></body></html>';
-    win.document.write(html);
-    win.document.close();
-  }
-  function copyCategory(catName) {
-    const items = document.querySelectorAll('.category[data-cat="' + catName + '"] .file-item');
-    let text = '';
-    items.forEach(item => {
-      const fname = item.querySelector('.file-name').textContent;
-      const content = item.querySelector('pre').textContent;
-      text += '===== ' + fname + ' =====\\n' + content + '\\n\\n';
-    });
-    copyText(text);
   }
 
-  // باز و بسته کردن دسته‌ها
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.cat-header').forEach(header => {
-      header.addEventListener('click', function(e) {
-        if (e.target.tagName === 'BUTTON') return;
-        const container = this.nextElementSibling;
-        const arrow = this.querySelector('.arrow');
-        if (container && arrow) {
-          if (container.style.display === 'none') {
-            container.style.display = 'block';
-            arrow.classList.remove('collapsed');
-          } else {
-            container.style.display = 'none';
-            arrow.classList.add('collapsed');
-          }
-        }
-      });
-    });
-  });
-<\/script>`;
+  // جاوااسکریپت داخلی - همه توابع به صورت سراسری
+  html += '<script>\n';
+  html += 'function toggleContent(id){var el=document.getElementById(id);if(!el)return;var content=el.querySelector(".content-area");if(content.style.display==="block"){content.style.display="none"}else{content.style.display="block"}}\n';
+  html += 'function toggleTextarea(id){var el=document.getElementById(id);if(!el)return;var content=el.querySelector(".content-area");if(content.style.display==="block"){content.style.display="none"}else{content.style.display="block";enableEdit(id)}}\n';
+  html += 'function enableEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){ta.readOnly=false;ta.style.borderColor="#3498db";ta.style.backgroundColor="#fff";editBar.style.display="flex"}}\n';
+  html += 'function saveEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){ta.readOnly=true;ta.style.borderColor="#ddd";ta.style.backgroundColor="#f9f9f9";editBar.style.display="none";el.setAttribute("data-content",ta.value.toLowerCase());filterFiles()}}\n';
+  html += 'function cancelEdit(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");var editBar=el.querySelector(".edit-bar");if(ta&&editBar){var original=el.getAttribute("data-original-content");if(original)ta.value=original;ta.readOnly=true;ta.style.borderColor="#ddd";ta.style.backgroundColor="#f9f9f9";editBar.style.display="none";el.setAttribute("data-content",ta.value.toLowerCase());filterFiles()}}\n';
+  html += 'function updateDataContent(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");if(ta)el.setAttribute("data-content",ta.value.toLowerCase())}\n';
+  html += 'function editFileName(id){var el=document.getElementById(id);if(!el)return;var titleSpan=el.querySelector(".file-title");if(!titleSpan)return;var oldName=titleSpan.textContent;var input=document.createElement("input");input.type="text";input.value=oldName;input.style.fontSize="13px";input.style.flex="1";input.style.padding="2px 6px";input.style.borderRadius="5px";input.style.border="1px solid #3498db";titleSpan.replaceWith(input);input.focus();input.select();function done(){var val=input.value.trim();if(val.length===0){alert("نام نمی‌تواند خالی باشد");input.focus();return}titleSpan.textContent=val;input.replaceWith(titleSpan);el.setAttribute("data-name",val.toLowerCase());filterFiles()}input.addEventListener("blur",done);input.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();done()}else if(e.key==="Escape"){input.replaceWith(titleSpan)}})}\n';
+  html += 'function copyContent(id){var el=document.getElementById(id);if(!el)return;var ta=el.querySelector("textarea");if(!ta)return;navigator.clipboard.writeText(ta.value).then(function(){alert("✅ کپی شد")}).catch(function(){alert("❌ خطا در کپی")})}\n';
+  html += 'function printFile(id){var el=document.getElementById(id);if(!el)return;var title=el.querySelector(".file-title").textContent;var ta=el.querySelector("textarea");if(!ta)return;var win=window.open("","_blank","width=800,height=600");if(!win){alert("پنجره مسدود");return}var content=ta.value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");var printHtml=\'<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>\'+title+\'</title><style>body{font-family:Tahoma,sans-serif;padding:30px;direction:rtl;color:#333}h1{color:#1565c0}pre{background:#f5f5f5;padding:20px;border-radius:8px;white-space:pre-wrap;word-break:break-word}</style></head><body><h1>📄 \'+title+\'</h1><pre>\'+content+\'</pre><script>setTimeout(function(){window.print();setTimeout(function(){window.close()},500)},500)<\\/script></body></html>\';win.document.write(printHtml);win.document.close()}\n';
+  html += 'function deleteFile(id){if(!confirm("آیا فایل حذف شود؟"))return;var el=document.getElementById(id);if(el){el.remove();filterFiles()}}\n';
+  html += 'function filterFiles(){var query=document.getElementById("searchBox").value.trim().toLowerCase();var containers=document.querySelectorAll(".file-container");var count=0;containers.forEach(function(c){var name=c.getAttribute("data-name")||"";var content=c.getAttribute("data-content")||"";if(name.indexOf(query)!==-1||content.indexOf(query)!==-1){c.style.display="block";count++}else{c.style.display="none"}});document.getElementById("searchStats").textContent="🔍 "+count+" فایل نمایش داده شده"}\n';
+  html += 'document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".file-container").forEach(function(el){var ta=el.querySelector("textarea");if(ta)el.setAttribute("data-original-content",ta.value)});filterFiles()});\n';
+  html += '<\/script>\n';
 
-  // اضافه کردن دسته‌بندی‌ها
-  [...categories].sort().forEach(cat => {
-    const catFiles = files.filter(f => f.category === cat);
-    if (catFiles.length === 0) return;
-
-    html += `
-<div class="category" data-cat="${escapeHtml(cat)}">
-  <div class="cat-header">
-    <span class="arrow">▼</span>
-    <h2>📁 ${escapeHtml(cat)} (${catFiles.length})</h2>
-    <span class="cat-buttons">
-      <button class="print-all" onclick="printCategory('${escapeHtml(cat)}')">🖨️ پرینت همه</button>
-      <button class="copy-all" onclick="copyCategory('${escapeHtml(cat)}')">📋 کپی همه</button>
-    </span>
-  </div>
-  <div class="files-container">`;
-
-    catFiles.forEach(file => {
-      html += `
-    <div class="file-item">
-      <div class="file-header">
-        <span class="file-name">📄 ${escapeHtml(file.name)}</span>
-        <span class="file-buttons">
-          <button class="print-file" onclick="printPre(this.parentElement.parentElement.nextElementSibling)">🖨️ پرینت</button>
-          <button class="copy-file" onclick="copyText(this.parentElement.parentElement.nextElementSibling.textContent)">📋 کپی</button>
-        </span>
-      </div>
-      <pre data-filename="${escapeHtml(file.name)}">${escapeHtml(file.content)}</pre>
-    </div>`;
-    });
-
-    html += `
-  </div>
-</div>`;
-  });
-
-  html += `</body></html>`;
+  html += '</body>\n</html>';
 
   download('output.html', html, 'text/html');
-  toast('✅ خروجی HTML با دکمه‌های پرینت، کپی و قابلیت باز/بسته شدن ساخته شد.', 'success');
-};
-
-$('exportJsonBtn').onclick = () => {
-  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
-  const data = { exportDate: new Date().toISOString(), files: files.map(f => ({id:f.id, name:f.name, content:f.content, category:f.category})), openStates };
-  download('text2html_backup.json', JSON.stringify(data, null, 2), 'application/json');
-  toast('✅ JSON ساخته شد', 'success');
-};
-
-$('importJsonInput').onchange = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) { toast('حجم JSON زیاد است', 'error'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      const imported = data.files || data;
-      if (!Array.isArray(imported)) { toast('JSON معتبر نیست', 'error'); return; }
-      if (imported.length > MAX_FILES) { toast('تعداد فایل‌ها زیاد است', 'error'); return; }
-
-      undoData = { action: 'cat', cat: 'ورودی JSON', files: files.map(f => ({...f})) };
-      $('undoBtn').disabled = false;
-
-      files = imported.map((f, i) => ({
-        id: f.id || idCounter++,
-        name: f.name || `file_${i+1}.txt`,
-        content: f.content || '',
-        category: f.category || 'دسته‌بندی نشده'
-      }));
-      openStates = data.openStates || {};
-      categories = new Set(files.map(f => f.category));
-      idCounter = Math.max(...files.map(f => f.id || 0), 0) + 1;
-      render(); searchDo(); saveData();
-      toast(`✅ ${files.length} فایل وارد شد`, 'success');
-    } catch(err) { toast('❌ خطا در خواندن JSON', 'error'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-};
-
-$('exportZipBtn').onclick = () => {
-  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
-  if (typeof JSZip === 'undefined') { toast('ZIP library not loaded', 'error'); return; }
-  const zip = new JSZip();
-  files.forEach(f => zip.folder(f.category || 'متفرقه').file(f.name, f.content));
-  zip.generateAsync({type:'blob'}).then(content => {
-    download('files.zip', content, 'application/zip');
-    toast('✅ ZIP ساخته شد', 'success');
-  }).catch(() => toast('❌ خطا', 'error'));
-};
-
-$('saveFilesBtn').onclick = () => {
-  if (files.length === 0) { toast('فایلی نیست', 'warning'); return; }
-  files.forEach(f => download(f.name, f.content, 'text/plain'));
-  toast(`✅ ${files.length} فایل ذخیره شد`, 'success');
-};
-
-$('clearAllBtn').onclick = clearAll;
-$('undoBtn').onclick = undo;
-
-// دارک مود
-let dark = false;
-$('darkToggle').onclick = () => {
-  dark = !dark;
-  document.body.style.background = dark ? '#1a1a2e' : '#f0f4f8';
-  document.body.style.color = dark ? '#e0e0e0' : '#333';
-  $('darkToggle').textContent = dark ? '☀️' : '🌙';
-  localStorage.setItem('t2h_dark', dark);
-};
-if (localStorage.getItem('t2h_dark') === 'true') $('darkToggle').click();
-
-// مودال‌ها
-$('helpBtn').onclick = () => $('helpModal').classList.add('active');
-$('closeHelp').onclick = () => $('helpModal').classList.remove('active');
-$('helpModal').onclick = e => { if (e.target === $('helpModal')) $('helpModal').classList.remove('active'); };
-
-// دکمه نویسنده
-const authorBtn = document.createElement('button');
-authorBtn.textContent = '👤';
-authorBtn.style.cssText = 'background:#eee;border:1px solid #aaa;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px';
-document.querySelector('.header-buttons')?.appendChild(authorBtn);
-authorBtn.onclick = () => $('authorModal').classList.add('active');
-$('closeAuthor').onclick = () => $('authorModal').classList.remove('active');
-$('authorModal').onclick = e => { if (e.target === $('authorModal')) $('authorModal').classList.remove('active'); };
-
-// فونت
-$('fontSelect').onchange = function() {
-  document.body.style.fontFamily = this.value;
-  localStorage.setItem('t2h_font', this.value);
-};
-const sf = localStorage.getItem('t2h_font');
-if (sf) { $('fontSelect').value = sf; document.body.style.fontFamily = sf; }
-
-// میانبر کیبورد
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key.toLowerCase() === 'a' && !e.ctrlKey && !e.metaKey) {
-    e.preventDefault();
-    $('toggleAllBtn').click();
-  }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-    e.preventDefault();
-    undo();
-  }
-  if (e.key === 'Escape') {
-    $('helpModal').classList.remove('active');
-    $('authorModal').classList.remove('active');
-  }
+  toast('✅ خروجی HTML با امکانات کامل ساخته شد','success');
 });
+// ============================================================
+// پایان بخش exportHtmlBtn
+// ============================================================
 
-// ===== مقداردهی اولیه =====
-if (!loadData()) {
-  files.push({ id: idCounter++, name: 'سلام.txt', content: 'سلام! به Text2Html خوش آمدید.\nاین یک فایل نمونه است.', category: 'آموزشی' });
-  categories.add('آموزشی');
-}
-render();
-searchDo();
+document.addEventListener('DOMContentLoaded', function() {
+  var loaded = loadFromDB();
+  if(!loaded) {
+    files.push({ id: idCounter++, name: 'سلام.txt', content: 'سلام! به Text2Html v5 خوش آمدید.\nاین یک فایل نمونه است.', category: 'آموزشی' });
+    categories.add('آموزشی');
+  }
+  render();
+  searchDo();
+  updateInfo();
 
-console.log('✅ Text2Html v4.0 - کاملاً عملیاتی');
-console.log('📊', files.length, 'فایل بارگذاری شد');
+  var dropArea = document.getElementById('dropArea');
+  if(dropArea) {
+    dropArea.addEventListener('dragover', function(e){ e.preventDefault(); this.classList.add('dragover'); });
+    dropArea.addEventListener('dragleave', function(e){ e.preventDefault(); this.classList.remove('dragover'); });
+    dropArea.addEventListener('drop', function(e){ e.preventDefault(); this.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+  }
 
+  document.getElementById('selectFilesBtn').addEventListener('click', function(){ document.getElementById('fileInput').click(); });
+  document.getElementById('addFilesBtn').addEventListener('click', function(){
+    var fi = document.getElementById('fileInput');
+    if(fi.files.length === 0) { toast('فایلی انتخاب نشده','warning'); return; }
+    addFiles(fi.files);
+  });
+
+  document.getElementById('manualAddBtn').addEventListener('click', function(){
+    var name = document.getElementById('manualName').value.trim();
+    var cat = document.getElementById('manualCat').value.trim();
+    var content = document.getElementById('manualContent').value || '';
+    if(!name) { toast('نام فایل را وارد کنید','warning'); return; }
+    var ext = name.split('.').pop().toLowerCase();
+    if(ACCEPTED.indexOf(ext) === -1) { toast('فرمت مجاز نیست','warning'); return; }
+    if(!cat) cat = 'دسته‌بندی نشده';
+    if(files.some(f => f.category === cat && f.name === name)) { toast('نام تکراری است','warning'); return; }
+    files.push({ id: idCounter++, name: name, content: content, category: cat });
+    categories.add(cat);
+    updateCatList();
+    render();
+    searchDo();
+    saveToDB();
+    document.getElementById('manualName').value = '';
+    document.getElementById('manualCat').value = '';
+    document.getElementById('manualContent').value = '';
+    toast('✅ "' + name + '" اضافه شد','success');
+  });
+
+  document.getElementById('toggleAllBtn').addEventListener('click', function(){
+    var allOpen = true;
+    var catArr = Array.from(categories);
+    for(var i=0; i<catArr.length; i++) { if(openStates[catArr[i]] === false) { allOpen = false; break; } }
+    for(var j=0; j<catArr.length; j++) { openStates[catArr[j]] = allOpen ? false : true; }
+    render(); saveToDB();
+    toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
+  });
+
+  document.getElementById('exportJsonBtn').addEventListener('click', function(){
+    if(files.length === 0) { toast('فایلی نیست','warning'); return; }
+    var data = { exportDate: new Date().toISOString(), files: files.map(f=> ({ id: f.id, name: f.name, content: f.content, category: f.category })), openStates: openStates };
+    download('text2html_backup.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('✅ JSON ساخته شد','success');
+  });
+
+  document.getElementById('importJsonLabel').addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('importJsonInput').click();
+  });
+
+  document.getElementById('importJsonInput').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 2 * 1024 * 1024) { 
+      toast('حجم JSON زیاد است','error'); 
+      this.value = ''; 
+      return; 
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        var imported = data.files || data;
+        if(!Array.isArray(imported)) { 
+          toast('JSON معتبر نیست','error'); 
+          document.getElementById('importJsonInput').value = '';
+          return; 
+        }
+        if(imported.length > MAX_FILES) { 
+          toast('تعداد فایل‌ها زیاد است','error'); 
+          document.getElementById('importJsonInput').value = '';
+          return; 
+        }
+        undoData = { action: 'cat', cat: 'ورودی JSON', files: files.map(f=> JSON.parse(JSON.stringify(f))) };
+        document.getElementById('undoBtn').disabled = false;
+        files = imported.map(function(f, i){
+          return {
+            id: f.id || idCounter++,
+            name: f.name || 'file_' + (i+1) + '.txt',
+            content: f.content || '',
+            category: f.category || 'دسته‌بندی نشده'
+          };
+        });
+        openStates = data.openStates || {};
+        categories = new Set(files.map(f=>f.category));
+        if(files.length > 0) {
+          idCounter = Math.max(...files.map(f=> f.id || 0)) + 1;
+          if(isNaN(idCounter)) idCounter = files.length + 1;
+        }
+        render();
+        searchDo();
+        saveToDB();
+        toast('✅ ' + files.length + ' فایل از JSON وارد شد','success');
+        document.getElementById('importJsonInput').value = '';
+      } catch(err) {
+        toast('❌ خطا در خواندن JSON: ' + err.message,'error');
+        document.getElementById('importJsonInput').value = '';
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('exportZipBtn').addEventListener('click', function(){
+    if(files.length === 0) { 
+      toast('فایلی نیست','warning'); 
+      return; 
+    }
+    if(typeof JSZip === 'undefined') { 
+      toast('⚠️ ZIP در دسترس نیست','warning'); 
+      return; 
+    }
+    try {
+      var zip = new JSZip();
+      var catMap = {};
+      for(var i=0; i<files.length; i++) {
+        var catName = files[i].category || 'متفرقه';
+        if(!catMap[catName]) catMap[catName] = zip.folder(catName);
+        catMap[catName].file(files[i].name, files[i].content);
+      }
+      zip.generateAsync({type:'blob'}).then(function(content){
+        var blobUrl = URL.createObjectURL(content);
+        var a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'files.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+        toast('✅ ZIP ساخته شد و دانلود شد','success');
+      }).catch(function(err){
+        toast('❌ خطا در ساخت ZIP','error');
+        console.error(err);
+      });
+    } catch(e) {
+      toast('❌ خطا','error');
+      console.error(e);
+    }
+  });
+
+  document.getElementById('saveFilesBtn').addEventListener('click', function(){
+    if(files.length === 0) { toast('فایلی نیست','warning'); return; }
+    toast('⏳ در حال دانلود...','info',3000);
+    for(var i=0; i<files.length; i++) {
+      (function(f){ setTimeout(function(){ download(f.name, f.content, 'text/plain'); }, i * 100); })(files[i]);
+    }
+  });
+
+  document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+  document.getElementById('undoBtn').addEventListener('click', undo);
+
+  var darkToggle = document.getElementById('darkToggle');
+  if(localStorage.getItem('t2h_dark_v5') === 'true') {
+    document.body.classList.add('dark');
+    darkToggle.textContent = '☀️';
+  }
+ darkToggle.addEventListener('click', function(){
+    document.body.classList.toggle('dark');
+    var isDark = document.body.classList.contains('dark');
+    this.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('t2h_dark_v5', isDark);
+  });
+
+  var fontSelect = document.getElementById('fontSelect');
+  if(localStorage.getItem('t2h_font_v5')) {
+    fontSelect.value = localStorage.getItem('t2h_font_v5');
+    document.body.style.fontFamily = fontSelect.value;
+  }
+  fontSelect.addEventListener('change', function(){
+    document.body.style.fontFamily = this.value;
+    localStorage.setItem('t2h_font_v5', this.value);
+  });
+
+  var helpBtn = document.getElementById('helpBtn');
+  var helpModal = document.getElementById('helpModal');
+  helpBtn.addEventListener('click', function(){ helpModal.classList.add('active'); });
+  document.getElementById('closeHelp').addEventListener('click', function(){ helpModal.classList.remove('active'); });
+  helpModal.addEventListener('click', function(e){ if(e.target === this) this.classList.remove('active'); });
+
+  var authorBtn = document.createElement('button');
+  authorBtn.textContent = '👤';
+  authorBtn.style.cssText = 'background:#eee;border:1px solid #aaa;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;color:#333';
+  document.querySelector('.header-buttons').appendChild(authorBtn);
+
+  var authorModal = document.getElementById('authorModal');
+  authorBtn.addEventListener('click', function(){ authorModal.classList.add('active'); });
+  document.getElementById('closeAuthor').addEventListener('click', function(){ authorModal.classList.remove('active'); });
+  authorModal.addEventListener('click', function(e){ if(e.target === this) this.classList.remove('active'); });
+
+  var searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(searchDo, 150);
+  });
+  searchInput.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') { this.value = ''; searchDo(); }
+    if(e.key === 'Enter') { clearTimeout(searchTimer); searchDo(); }
+  });
+
+  document.getElementById('saveSearchResultsBtn').addEventListener('click', saveSearchResults);
+  document.getElementById('saveSearchTextsBtn').addEventListener('click', saveSearchTexts);
+  document.getElementById('saveSearchJsonBtn').addEventListener('click', saveSearchJson);
+
+  document.addEventListener('keydown', function(e) {
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if(e.key.toLowerCase() === 'a' && !e.ctrlKey) { e.preventDefault(); document.getElementById('toggleAllBtn').click(); }
+    if((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+    if(e.key === 'Escape') { helpModal.classList.remove('active'); authorModal.classList.remove('active'); }
+  });
+
+  toast('✅ Text2Html v5 آماده است','success',2000);
+});
 </script>
 </body>
 </html>
