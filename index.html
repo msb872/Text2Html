@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -206,7 +207,258 @@ function saveToDB(){try{var data={files:files,openStates:openStates,idCounter:id
 
 function loadFromDB(){try{var raw=localStorage.getItem('t2h_v5_full');if(!raw)return false;var data=JSON.parse(raw);if(data.files&&data.files.length>0){files=data.files;openStates=data.openStates||{};idCounter=data.idCounter||Math.max.apply(null,files.map(f=>f.id||0))+1;if(isNaN(idCounter))idCounter=1;categories=new Set(files.map(f=>f.category));return true;}}catch(e){}return false;}
 
-function render(){var container=document.getElementById('filesList');if(!container)return;container.innerHTML='';if(files.length===0){container.innerHTML='<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';updateInfo();return;}categories=new Set(files.map(f=>f.category));updateCatList();var catArr=Array.from(categories).sort();for(var ci=0;ci<catArr.length;ci++){var cat=catArr[ci];var catFiles=files.filter(f=>f.category===cat);if(catFiles.length===0)continue;var box=document.createElement('div');box.className='category-box';var header=document.createElement('div');header.className='category-header';var isOpen=openStates[cat]!==false;var arrow=document.createElement('span');arrow.className='arrow'+(isOpen?'':' collapsed');arrow.textContent='▼';var title=document.createElement('h2');title.textContent=cat;title.onclick=function(e){e.stopPropagation();editCatName(this,cat);};var count=document.createElement('span');count.className='count';count.textContent=catFiles.length+' فایل';var actions=document.createElement('div');actions.className='cat-actions';var pBtn=document.createElement('button');pBtn.textContent='🖨️';pBtn.title='پرینت دسته';pBtn.onclick=function(e){e.stopPropagation();printCategory(cat);};var cBtn=document.createElement('button');cBtn.textContent='📋';cBtn.title='کپی محتوای دسته';cBtn.onclick=function(e){e.stopPropagation();copyCategory(cat);};var dBtn=document.createElement('button');dBtn.className='danger';dBtn.textContent='🗑️';dBtn.title='حذف دسته';dBtn.onclick=function(e){e.stopPropagation();deleteCategory(cat);};actions.appendChild(pBtn);actions.appendChild(cBtn);actions.appendChild(dBtn);header.appendChild(arrow);header.appendChild(title);header.appendChild(count);header.appendChild(actions);var filesContainer=document.createElement('div');filesContainer.className='files-container';filesContainer.style.display=isOpen?'block':'none';header.onclick=function(){var vis=filesContainer.style.display==='block';filesContainer.style.display=vis?'none':'block';arrow.classList.toggle('collapsed',vis);openStates[cat]=!vis;saveToDB();};box.appendChild(header);box.appendChild(filesContainer);var sorted=catFiles.sort(function(a,b){return a.name.localeCompare(b.name);});for(var fi=0;fi<sorted.length;fi++){var file=sorted[fi];var item=document.createElement('div');item.className='file-item';var fh=document.createElement('div');fh.className='file-header';var farrow=document.createElement('span');farrow.className='arrow';farrow.textContent='▶';var fn=document.createElement('span');fn.className='fname';fn.textContent=file.name;fn.onclick=function(e){e.stopPropagation();editFileName(this,file);};var fa=document.createElement('div');fa.className='file-actions';var copyFileBtn=document.createElement('button');copyFileBtn.textContent='📋';copyFileBtn.title='کپی محتوا';copyFileBtn.onclick=function(e){e.stopPropagation();navigator.clipboard.writeText(file.content).then(function(){toast('✅ کپی شد','success');}).catch(function(){toast('❌ خطا','error');});};var printFileBtn=document.createElement('button');printFileBtn.className='success';printFileBtn.textContent='🖨️';printFileBtn.title='پرینت فایل';printFileBtn.onclick=function(e){e.stopPropagation();printFile(file);};var deleteFileBtn=document.createElement('button');deleteFileBtn.className='danger';deleteFileBtn.textContent='🗑️';deleteFileBtn.title='حذف فایل';deleteFileBtn.onclick=function(e){e.stopPropagation();deleteFile(file.id);};fa.appendChild(copyFileBtn);fa.appendChild(printFileBtn);fa.appendChild(deleteFileBtn);fh.appendChild(farrow);fh.appendChild(fn);fh.appendChild(fa);var fc=document.createElement('div');fc.className='file-content';fc.style.display='none';var ta=document.createElement('textarea');ta.value=file.content;ta.oninput=function(){var idx=files.findIndex(f=>f.id===file.id);if(idx>-1)files[idx].content=this.value;searchDo();saveToDB();};var ca=document.createElement('div');ca.className='content-actions';var saveBtn=document.createElement('button');saveBtn.textContent='💾 ذخیره';saveBtn.onclick=function(e){e.stopPropagation();saveToDB();toast('✅ ذخیره شد','success');};var dlBtn=document.createElement('button');dlBtn.textContent='⬇️ دانلود';dlBtn.onclick=function(e){e.stopPropagation();download(file.name,file.content,'text/plain');};ca.appendChild(saveBtn);ca.appendChild(dlBtn);fc.appendChild(ta);fc.appendChild(ca);item.appendChild(fh);item.appendChild(fc);fh.onclick=function(){var vis=fc.style.display==='block';fc.style.display=vis?'none':'block';farrow.classList.toggle('open',!vis);farrow.textContent=vis?'▶':'▼';};filesContainer.appendChild(item);}container.appendChild(box);}updateInfo();}
+function render(){var container=document.getElementById('filesList');if(!container)return;container.innerHTML='';if(files.length===0){container.innerHTML='<div style="text-align:center;padding:50px 20px;color:#888"><div style="font-size:60px">📂</div><p style="font-size:18px;margin-top:12px">هنوز فایلی اضافه نشده است</p><p>فایل‌های خود را بکشید و رها کنید</p></div>';updateInfo();return;}categories=new Set(files.map(f=>f.category));updateCatList();var catArr=Array.from(categories).sort();
+
+for (let ci = 0; ci < catArr.length; ci++) {
+
+    let cat = catArr[ci];
+
+    let catFiles = files.filter(f => f.category === cat);
+
+    if (!catFiles.length) continue;
+
+    let box = document.createElement("div");
+    box.className = "category-box";
+
+    let header = document.createElement("div");
+    header.className = "category-header";
+
+    let isOpen = openStates[cat] !== false;
+
+    let arrow = document.createElement("span");
+    arrow.className = "arrow" + (isOpen ? "" : " collapsed");
+    arrow.textContent = "▼";
+
+    let title = document.createElement("h2");
+    title.textContent = cat;
+
+    title.addEventListener("click", function (e) {
+        e.stopPropagation();
+        editCatName(this, cat);
+    });
+
+    let count = document.createElement("span");
+    count.className = "count";
+    count.textContent = catFiles.length + " فایل";
+
+    let actions = document.createElement("div");
+    actions.className = "cat-actions";
+
+    let pBtn = document.createElement("button");
+    pBtn.textContent = "🖨️";
+    pBtn.title = "پرینت دسته";
+
+    pBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        printCategory(cat);
+    });
+
+    let cBtn = document.createElement("button");
+    cBtn.textContent = "📋";
+    cBtn.title = "کپی دسته";
+
+    cBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        copyCategory(cat);
+    });
+
+    let dBtn = document.createElement("button");
+    dBtn.className = "danger";
+    dBtn.textContent = "🗑️";
+    dBtn.title = "حذف دسته";
+
+    dBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        deleteCategory(cat);
+    });
+
+    actions.appendChild(pBtn);
+    actions.appendChild(cBtn);
+    actions.appendChild(dBtn);
+
+    header.appendChild(arrow);
+    header.appendChild(title);
+    header.appendChild(count);
+    header.appendChild(actions);
+
+    let filesContainer = document.createElement("div");
+    filesContainer.className = "files-container";
+    filesContainer.style.display = isOpen ? "block" : "none";
+
+    header.addEventListener("click", function () {
+
+        const opened = filesContainer.style.display === "block";
+
+        filesContainer.style.display = opened ? "none" : "block";
+
+        arrow.classList.toggle("collapsed", opened);
+
+        openStates[cat] = !opened;
+
+        saveToDB();
+
+    });
+
+    box.appendChild(header);
+    box.appendChild(filesContainer);
+
+    let sorted = [...catFiles].sort((a, b) =>
+        a.name.localeCompare(b.name)
+    );
+
+
+
+
+for (let fi = 0; fi < sorted.length; fi++) {
+
+    let file = sorted[fi];
+
+    let item = document.createElement("div");
+    item.className = "file-item";
+
+    let fh = document.createElement("div");
+    fh.className = "file-header";
+
+    let farrow = document.createElement("span");
+    farrow.className = "arrow";
+    farrow.textContent = "▶";
+
+    let fn = document.createElement("span");
+    fn.className = "fname";
+    fn.textContent = file.name;
+
+    fn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        editFileName(this, file);
+    });
+
+    let fa = document.createElement("div");
+    fa.className = "file-actions";
+
+    let copyFileBtn = document.createElement("button");
+    copyFileBtn.textContent = "📋";
+    copyFileBtn.title = "کپی محتوا";
+
+    copyFileBtn.addEventListener("click", function (e) {
+
+        e.stopPropagation();
+
+        navigator.clipboard.writeText(file.content)
+            .then(() => toast("✅ کپی شد", "success"))
+            .catch(() => toast("❌ خطا", "error"));
+
+    });
+
+    let printFileBtn = document.createElement("button");
+    printFileBtn.className = "success";
+    printFileBtn.textContent = "🖨️";
+    printFileBtn.title = "پرینت فایل";
+
+    printFileBtn.addEventListener("click", function (e) {
+
+        e.stopPropagation();
+
+        printFile(file);
+
+    });
+
+    let deleteFileBtn = document.createElement("button");
+    deleteFileBtn.className = "danger";
+    deleteFileBtn.textContent = "🗑️";
+    deleteFileBtn.title = "حذف فایل";
+
+    deleteFileBtn.addEventListener("click", function (e) {
+
+        e.stopPropagation();
+
+        deleteFile(file.id);
+
+    });
+
+    fa.appendChild(copyFileBtn);
+    fa.appendChild(printFileBtn);
+    fa.appendChild(deleteFileBtn);
+
+    fh.appendChild(farrow);
+    fh.appendChild(fn);
+    fh.appendChild(fa);
+
+    let fc = document.createElement("div");
+    fc.className = "file-content";
+    fc.style.display = "none";
+
+    let ta = document.createElement("textarea");
+    ta.value = file.content;
+
+    ta.addEventListener("input", function () {
+
+        file.content = this.value;
+
+        searchDo();
+
+        saveToDB();
+
+    });
+
+    let ca = document.createElement("div");
+    ca.className = "content-actions";
+
+    let saveBtn = document.createElement("button");
+    saveBtn.textContent = "💾 ذخیره";
+
+    saveBtn.addEventListener("click", function (e) {
+
+        e.stopPropagation();
+
+        saveToDB();
+
+        toast("✅ ذخیره شد", "success");
+
+    });
+
+    let dlBtn = document.createElement("button");
+    dlBtn.textContent = "⬇️ دانلود";
+
+    dlBtn.addEventListener("click", function (e) {
+
+        e.stopPropagation();
+
+        download(
+    file.name.replace(/[\\/:*?"<>|]/g, "_"),
+    file.content,
+    "text/plain"
+);
+
+    });
+
+    ca.appendChild(saveBtn);
+    ca.appendChild(dlBtn);
+
+    fc.appendChild(ta);
+    fc.appendChild(ca);
+
+    item.appendChild(fh);
+    item.appendChild(fc);
+
+    fh.addEventListener("click", function () {
+
+        const opened = fc.style.display === "block";
+
+        fc.style.display = opened ? "none" : "block";
+
+        farrow.textContent = opened ? "▶" : "▼";
+
+        farrow.classList.toggle("open", !opened);
+
+    });
+
+    filesContainer.appendChild(item);
+
+}
+
+
+
+container.appendChild(box);}updateInfo();}
 
 function editCatName(el,old){var input=document.createElement('input');input.type='text';input.value=old;input.className='inline-edit';el.replaceWith(input);input.focus();input.select();var cancelled=false;function done(){if(cancelled)return;var val=input.value.trim();if(!val){toast('نام نمی‌تواند خالی باشد','warning');input.focus();return;}if(val===old){input.replaceWith(el);return;}if(categories.has(val)){toast('نام تکراری است','warning');input.focus();return;}categories.delete(old);categories.add(val);for(var i=0;i<files.length;i++){if(files[i].category===old)files[i].category=val;}render();searchDo();saveToDB();toast('✅ نام تغییر کرد','success');}input.addEventListener('blur',done);input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur();}else if(e.key==='Escape'){cancelled=true;this.replaceWith(el);}});}
 
@@ -428,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
     for(var i=0; i<catArr.length; i++) { if(openStates[catArr[i]] === false) { allOpen = false; break; } }
     for(var j=0; j<catArr.length; j++) { openStates[catArr[j]] = allOpen ? false : true; }
     render(); saveToDB();
-    toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
+    
   });
 
   document.getElementById('exportJsonBtn').addEventListener('click', function(){
@@ -461,7 +713,9 @@ toast(allOpen ? 'همه بسته شد' : 'همه باز شد');
         openStates = data.openStates || {};
         categories = new Set(files.map(f=>f.category));
         if(files.length > 0) { idCounter = Math.max(...files.map(f=> f.id || 0)) + 1; if(isNaN(idCounter)) idCounter = files.length + 1; }
-        render(); searchDo(); saveToDB();
+        render(); searchDo(); 
+
+saveToDB();
         toast('✅ ' + files.length + ' فایل از JSON وارد شد','success');
         document.getElementById('importJsonInput').value = '';
       } catch(err) { toast('❌ خطا در خواندن JSON','error'); document.getElementById('importJsonInput').value = ''; }
